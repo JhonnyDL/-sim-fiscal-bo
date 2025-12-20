@@ -3,7 +3,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { ArrowRight, TrendingUp, TrendingDown, AlertTriangle } from "lucide-react"
-import type { ResultadoAnual } from "@/lib/simulador-avanzado"
+import type { ResultadoAnual } from "@/lib/types"
 
 interface Props {
   resultado: ResultadoAnual

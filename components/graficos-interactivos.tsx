@@ -1,6 +1,6 @@
 "use client"
 
-import { Line, Bar, Doughnut } from "react-chartjs-2"
+import { Line, Bar, Doughnut, Chart } from "react-chartjs-2"
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -15,7 +15,7 @@ import {
   Filler,
 } from "chart.js"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import type { ResultadoAnual } from "@/lib/simulador-avanzado"
+import type { ResultadoAnual } from "@/lib/types"
 
 ChartJS.register(
   CategoryScale,
@@ -111,10 +111,10 @@ export default function GraficosInteractivos({ resultados, anoActual = resultado
           ultimoResultado.ing_iva,
           ultimoResultado.ing_iue,
           ultimoResultado.ing_it +
-            ultimoResultado.ing_itf +
-            ultimoResultado.ing_rc_iva +
-            ultimoResultado.ing_ice +
-            ultimoResultado.ing_ga,
+          ultimoResultado.ing_itf +
+          ultimoResultado.ing_rc_iva +
+          ultimoResultado.ing_ice +
+          ultimoResultado.ing_ga,
         ],
         backgroundColor: ["#007A3D", "#8B4513", "#FCD116", "#FF6384", "#DA291C"],
         borderWidth: 2,
@@ -207,7 +207,8 @@ export default function GraficosInteractivos({ resultados, anoActual = resultado
           </CardDescription>
         </CardHeader>
         <CardContent className="pt-6">
-          <Bar
+          <Chart
+            type="bar"
             data={dataDeuda}
             options={{
               ...optionsComunes,

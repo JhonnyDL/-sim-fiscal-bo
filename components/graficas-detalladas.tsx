@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import type { ResultadoAnual } from "@/lib/simulador-avanzado"
+import type { ResultadoAnual } from "@/lib/types"
 import {
   BarChart,
   Bar,
