@@ -1,292 +1,236 @@
 "use client"
 
 import type React from "react"
+import { useEffect, useState } from "react"
 import Image from "next/image"
+import { motion, useScroll, useSpring } from "framer-motion"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { ExternalLink, LineChart, Database, TrendingUp, DollarSign, Building2, ArrowRight } from "lucide-react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { ExternalLink, Database, TrendingUp, DollarSign, Building2, ArrowRight, Activity, TrendingDown, ChevronDown } from "lucide-react"
 
 const ROJO_BOLIVIA = "#DA291C"
 const AMARILLO_BOLIVIA = "#FCD116"
 const VERDE_BOLIVIA = "#007A3D"
 
-interface FuenteDatos {
-  nombre: string
-  url: string
-  icono: React.ReactNode
-  descripcion: string
-}
+// 1. Fondo Ultra-Dinámico corregido para evitar errores de hidratación
+const BackgroundDynamic = () => {
+  const [mounted, setMounted] = useState(false)
+  const [orbs, setOrbs] = useState<any[]>([])
 
-const fuentes: FuenteDatos[] = [
-  {
-    nombre: "Ministerio de Economía y Finanzas Públicas",
-    url: "https://www.economiayfinanzas.gob.bo",
-    icono: <Building2 className="h-6 w-6" />,
-    descripcion: "Deuda pública, flujos de caja, ingresos tributarios, operaciones del sector público",
-  },
-  {
-    nombre: "YPFB - Yacimientos Petrolíferos Fiscales Bolivianos",
-    url: "https://www.ypfb.gob.bo/Gas_natural",
-    icono: <TrendingUp className="h-6 w-6" />,
-    descripcion: "Producción fiscalizada de gas natural, exportaciones, volumen comercializado mercado interno",
-  },
-  {
-    nombre: "Instituto Nacional de Estadística (INE)",
-    url: "https://www.ine.gob.bo",
-    icono: <Database className="h-6 w-6" />,
-    descripcion:
-      "Comercio exterior, precios internacionales, cuentas nacionales, hidrocarburos, minería, estadísticas económicas",
-  },
-  {
-    nombre: "Banco Central de Bolivia (BCB)",
-    url: "https://www.bcb.gob.bo",
-    icono: <DollarSign className="h-6 w-6" />,
-    descripcion: "Tipos de cambio históricos, tasas de interés activas y pasivas, LIBOR, cotizaciones",
-  },
-  {
-    nombre: "DatosMacro - Ratings Bolivia",
-    url: "https://datosmacro.expansion.com/ratings/bolivia",
-    icono: <LineChart className="h-4 w-4" />,
-    descripcion: "Calificaciones de riesgo país, indicadores macroeconómicos internacionales",
-  },
-]
+  useEffect(() => {
+    // Generamos los valores aleatorios solo en el cliente
+    const generatedOrbs = [...Array(5)].map((_, i) => ({
+      id: i,
+      x: [Math.random() * 100, Math.random() * -100, Math.random() * 100],
+      y: [Math.random() * 100, Math.random() * -100, Math.random() * 100],
+      duration: 15 + i * 2,
+      left: `${Math.random() * 100}%`,
+      top: `${Math.random() * 100}%`,
+      color: i % 2 === 0 ? VERDE_BOLIVIA : ROJO_BOLIVIA
+    }))
+    setOrbs(generatedOrbs)
+    setMounted(true)
+  }, [])
 
-interface Props {
-  onIniciar: () => void
-}
+  if (!mounted) return <div className="fixed inset-0 -z-10 bg-slate-50" />
 
-export default function LandingPage({ onIniciar }: Props) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 via-yellow-50 to-green-50">
-      {/* Hero Section */}
-      <div className="relative overflow-hidden">
-        <div
-          className="absolute inset-0 opacity-10"
+    <div className="fixed inset-0 -z-10 overflow-hidden bg-slate-50">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,_rgba(0,122,61,0.05)_0%,_transparent_50%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_70%,_rgba(218,41,28,0.05)_0%,_transparent_50%)]" />
+
+      {orbs.map((orb) => (
+        <motion.div
+          key={orb.id}
+          animate={{
+            x: orb.x,
+            y: orb.y,
+            scale: [1, 1.2, 1],
+          }}
+          transition={{ duration: orb.duration, repeat: Infinity, ease: "linear" }}
+          className="absolute w-[400px] h-[400px] rounded-full blur-[120px] opacity-20"
           style={{
-            background: `linear-gradient(135deg, ${ROJO_BOLIVIA} 0%, ${AMARILLO_BOLIVIA} 50%, ${VERDE_BOLIVIA} 100%)`,
+            backgroundColor: orb.color,
+            left: orb.left,
+            top: orb.top,
           }}
         />
-        <div className="container mx-auto px-4 py-16 relative">
-          <div className="max-w-4xl mx-auto text-center">
-            <div className="flex justify-center mb-8">
-              <div className="relative w-48 h-48 drop-shadow-2xl">
-                <Image
-                  src="/escudo-bolivia.png"
-                  alt="Escudo de Bolivia"
-                  fill
-                  className="object-contain animate-float"
-                  priority
-                />
-              </div>
-            </div>
-
-            <h1 className="text-5xl md:text-6xl font-bold mb-6 text-balance">
-              Simulador Fiscal Macroeconómico
-              <br />
-              <span style={{ color: VERDE_BOLIVIA }}>Estado Plurinacional de Bolivia</span>
-            </h1>
-
-            <p className="text-xl md:text-2xl text-gray-700 mb-8 leading-relaxed text-balance">
-              Herramienta avanzada para análisis dinámico del Presupuesto General del Estado (PGE) con simulación
-              <span className="font-bold text-red-600"> año por año</span> de relaciones causa-efecto entre variables
-              macroeconómicas
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-              <Button
-                size="lg"
-                className="text-lg px-8 py-6 shadow-lg hover:shadow-xl transition-all hover:scale-105"
-                style={{ backgroundColor: VERDE_BOLIVIA }}
-                onClick={onIniciar}
-              >
-                Iniciar Simulador
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </div>
-
-            {/* Características clave */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-              <Card className="border-2 hover:scale-105 transition-transform" style={{ borderColor: ROJO_BOLIVIA }}>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2" style={{ color: ROJO_BOLIVIA }}>
-                    <LineChart className="h-5 w-5" />
-                    Simulación Año por Año
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">
-                    Avance manual o automático con visualización progresiva de cada período fiscal
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card className="border-2 hover:scale-105 transition-transform" style={{ borderColor: AMARILLO_BOLIVIA }}>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2" style={{ color: "#E5A500" }}>
-                    <TrendingUp className="h-5 w-5" />
-                    Relaciones Causa-Efecto
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">
-                    Comprenda las interdependencias entre ingresos, gastos, deuda, RIN y crecimiento económico
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card className="border-2 hover:scale-105 transition-transform" style={{ borderColor: VERDE_BOLIVIA }}>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2" style={{ color: VERDE_BOLIVIA }}>
-                    <Database className="h-5 w-5" />
-                    Datos Oficiales
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">
-                    Basado en fuentes gubernamentales: MEFP, YPFB, INE, BCB y organismos internacionales
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Fuentes de Datos Section */}
-      <div className="bg-white py-16">
-        <div className="container mx-auto px-4">
-          <div className="max-w-6xl mx-auto">
-            <h2 className="text-4xl font-bold text-center mb-4" style={{ color: VERDE_BOLIVIA }}>
-              Fuentes de Datos Oficiales
-            </h2>
-            <p className="text-center text-lg text-gray-600 mb-12 text-balance">
-              Toda la información utilizada proviene de instituciones oficiales bolivianas y organismos reconocidos
-            </p>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {fuentes.map((fuente, idx) => (
-                <Card key={idx} className="border-2 hover:shadow-lg transition-all group">
-                  <CardHeader>
-                    <div className="flex items-start gap-4">
-                      <div
-                        className="p-3 rounded-lg group-hover:scale-110 transition-transform"
-                        style={{ backgroundColor: AMARILLO_BOLIVIA }}
-                      >
-                        {fuente.icono}
-                      </div>
-                      <div className="flex-1">
-                        <CardTitle className="text-lg mb-2">{fuente.nombre}</CardTitle>
-                        <CardDescription className="text-sm">{fuente.descripcion}</CardDescription>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <a
-                      href={fuente.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 text-sm font-medium hover:underline"
-                      style={{ color: VERDE_BOLIVIA }}
-                    >
-                      Visitar sitio web
-                      <ExternalLink className="h-4 w-4" />
-                    </a>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-
-            {/* Detalle de datos por categoría */}
-            <div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <Card className="bg-gradient-to-br from-red-50 to-red-100 hover:scale-105 transition-transform">
-                <CardHeader>
-                  <CardTitle className="text-base">Gobierno - MEFP</CardTitle>
-                </CardHeader>
-                <CardContent className="text-sm space-y-1 text-gray-700">
-                  <p>• Deuda pública externa e interna TGN</p>
-                  <p>• Flujos de caja (GAM, GAD, TGN)</p>
-                  <p>• Inversión pública</p>
-                  <p>• Recaudaciones tributarias</p>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-gradient-to-br from-yellow-50 to-yellow-100 hover:scale-105 transition-transform">
-                <CardHeader>
-                  <CardTitle className="text-base">Gas Natural - YPFB</CardTitle>
-                </CardHeader>
-                <CardContent className="text-sm space-y-1 text-gray-700">
-                  <p>• Producción fiscalizada</p>
-                  <p>• Exportaciones por país</p>
-                  <p>• Volumen mercado interno</p>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-gradient-to-br from-green-50 to-green-100 hover:scale-105 transition-transform">
-                <CardHeader>
-                  <CardTitle className="text-base">Estadísticas - INE</CardTitle>
-                </CardHeader>
-                <CardContent className="text-sm space-y-1 text-gray-700">
-                  <p>• Comercio exterior</p>
-                  <p>• Precios internacionales</p>
-                  <p>• Cuentas nacionales</p>
-                  <p>• Hidrocarburos y minería</p>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-gradient-to-br from-blue-50 to-blue-100 hover:scale-105 transition-transform">
-                <CardHeader>
-                  <CardTitle className="text-base">Finanzas - BCB</CardTitle>
-                </CardHeader>
-                <CardContent className="text-sm space-y-1 text-gray-700">
-                  <p>• Tipos de cambio histórico</p>
-                  <p>• Tasas de interés</p>
-                  <p>• LIBOR</p>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-gradient-to-br from-purple-50 to-purple-100 hover:scale-105 transition-transform">
-                <CardHeader>
-                  <CardTitle className="text-base">Riesgo País</CardTitle>
-                </CardHeader>
-                <CardContent className="text-sm space-y-1 text-gray-700">
-                  <p>• Calificaciones crediticias</p>
-                  <p>• Indicadores de riesgo</p>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-gradient-to-br from-orange-50 to-orange-100 hover:scale-105 transition-transform">
-                <CardHeader>
-                  <CardTitle className="text-base">Minería - INE</CardTitle>
-                </CardHeader>
-                <CardContent className="text-sm space-y-1 text-gray-700">
-                  <p>• Zinc, Estaño, Oro, Plata</p>
-                  <p>• Litio</p>
-                  <p>• Precios y volúmenes</p>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Footer CTA */}
-      <div className="py-16" style={{ backgroundColor: VERDE_BOLIVIA }}>
-        <div className="container mx-auto px-4 text-center">
-          <h3 className="text-3xl font-bold text-white mb-4">¿Listo para explorar el sistema fiscal boliviano?</h3>
-          <p className="text-white/90 text-lg mb-8">
-            Modifique parámetros, observe impactos año por año y comprenda las dinámicas macroeconómicas
-          </p>
-          <Button
-            size="lg"
-            className="text-lg px-8 py-6 shadow-xl hover:shadow-2xl transition-all hover:scale-105"
-            style={{ backgroundColor: "white", color: VERDE_BOLIVIA }}
-            onClick={onIniciar}
-          >
-            Comenzar Simulación
-            <ArrowRight className="ml-2 h-5 w-5" />
-          </Button>
-        </div>
-      </div>
+      ))}
     </div>
   )
 }
+
+export default function LandingPage({ onIniciar }: { onIniciar: () => void }) {
+  const { scrollYProgress } = useScroll()
+  const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30 })
+
+  return (
+    <div className="relative min-h-screen selection:bg-yellow-200">
+      <motion.div className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-red-600 via-yellow-400 to-green-600 z-50 origin-left" style={{ scaleX }} />
+
+      <BackgroundDynamic />
+
+      <section className="relative min-h-screen flex flex-col items-center justify-center px-4 overflow-hidden">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1, ease: "easeOut" }}
+          className="text-center z-10"
+        >
+          <motion.div
+            animate={{ y: [0, -15, 0] }}
+            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+            className="inline-block mb-8 relative"
+          >
+            <div className="absolute inset-0 bg-yellow-400/20 blur-3xl rounded-full" />
+            <Image src="/escudo-bolivia.png" alt="Escudo" width={160} height={160} className="relative drop-shadow-2xl" priority />
+          </motion.div>
+
+          <h1 className="text-6xl md:text-8xl font-black mb-6 tracking-tighter text-slate-900">
+            SIMULADOR <span className="block text-transparent bg-clip-text bg-gradient-to-r from-red-600 via-yellow-500 to-green-600 tracking-normal">ECONÓMICO</span>
+          </h1>
+
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+            className="text-xl md:text-2xl text-slate-600 max-w-2xl mx-auto mb-10 font-medium"
+          >
+            Visualiza el futuro fiscal de Bolivia. Ajusta variables, prevé crisis y optimiza el crecimiento en un entorno dinámico.
+          </motion.p>
+
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <Button
+              size="lg"
+              className="group h-20 px-12 text-2xl rounded-2xl shadow-[0_20px_50px_rgba(0,122,61,0.3)] bg-green-700 hover:bg-green-800 transition-all border-b-4 border-green-900"
+              onClick={onIniciar}
+            >
+              EMPEZAR AHORA
+              <ArrowRight className="ml-3 h-8 w-8 group-hover:translate-x-2 transition-transform" />
+            </Button>
+          </motion.div>
+        </motion.div>
+
+        <motion.div
+          animate={{ y: [0, 10, 0] }}
+          transition={{ repeat: Infinity, duration: 2 }}
+          className="absolute bottom-10"
+        >
+          <ChevronDown className="h-10 w-10 text-slate-400" />
+        </motion.div>
+      </section>
+
+      <section className="container mx-auto px-4 py-32">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+          <FeatureCard
+            icon={<TrendingUp className="h-10 w-10" />}
+            title="Bonanza Económica"
+            desc="Simula escenarios de altos precios de materias primas y exportaciones récord."
+            color={VERDE_BOLIVIA}
+          />
+          <FeatureCard
+            icon={<TrendingDown className="h-10 w-10" />}
+            title="Escenarios de Riesgo"
+            desc="Analiza el impacto del déficit, la caída de reservas y variaciones del tipo de cambio."
+            color={ROJO_BOLIVIA}
+          />
+          <FeatureCard
+            icon={<Activity className="h-10 w-10" />}
+            title="Flujo en Vivo"
+            desc="Cálculos matemáticos precisos basados en el Presupuesto General del Estado."
+            color={AMARILLO_BOLIVIA}
+          />
+        </div>
+      </section>
+
+      <section className="bg-slate-900 py-32 relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-20 bg-gradient-to-b from-slate-50 to-transparent opacity-100" />
+        <div className="container mx-auto px-4 relative">
+          <motion.div
+            initial={{ opacity: 0, x: -50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            className="mb-20"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">Datos de Grado Gubernamental</h2>
+            <div className="h-2 w-40 bg-green-500 rounded-full" />
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {fuentes.map((f, i) => (
+              <SourceCard key={i} source={f} index={i} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <footer className="py-40 bg-white flex justify-center items-center overflow-hidden relative">
+        <motion.div
+          whileInView={{ scale: [0.9, 1.05, 1] }}
+          className="text-center z-10"
+        >
+          <h2 className="text-5xl md:text-7xl font-black text-slate-900 mb-8 italic">¿LISTO PARA DIRIGIR?</h2>
+          <Button
+            onClick={onIniciar}
+            className="bg-red-600 hover:bg-red-700 text-white text-3xl h-24 px-16 rounded-full shadow-2xl transition-transform hover:scale-110"
+          >
+            LANZAR SIMULACIÓN
+          </Button>
+        </motion.div>
+        <div className="absolute inset-0 opacity-5 pointer-events-none flex justify-center items-center text-[20vw] font-black text-slate-900 select-none">
+          BOLIVIA
+        </div>
+      </footer>
+    </div>
+  )
+}
+
+function FeatureCard({ icon, title, desc, color }: any) {
+  return (
+    <motion.div
+      whileHover={{ y: -20, rotate: 1 }}
+      initial={{ opacity: 0, y: 50 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+    >
+      <Card className="h-full border-none shadow-[0_10px_40px_rgba(0,0,0,0.04)] bg-white/80 backdrop-blur-xl group overflow-hidden">
+        <div className="h-2 w-full" style={{ backgroundColor: color }} />
+        <CardHeader className="pt-8">
+          <div className="p-4 rounded-2xl w-fit transition-all group-hover:scale-110 group-hover:rotate-12" style={{ backgroundColor: `${color}15`, color: color }}>
+            {icon}
+          </div>
+          <CardTitle className="text-2xl mt-4">{title}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-slate-500 leading-relaxed text-lg">{desc}</p>
+        </CardContent>
+      </Card>
+    </motion.div>
+  )
+}
+
+function SourceCard({ source, index }: any) {
+  return (
+    <motion.a
+      href={source.url}
+      target="_blank"
+      initial={{ opacity: 0, scale: 0.9 }}
+      whileInView={{ opacity: 1, scale: 1 }}
+      transition={{ delay: index * 0.1 }}
+      className="group block p-8 bg-slate-800/50 hover:bg-green-900/40 border border-slate-700 rounded-3xl transition-all"
+    >
+      <div className="text-yellow-400 mb-6 group-hover:scale-110 transition-transform">{source.icono}</div>
+      <h3 className="text-xl font-bold text-white mb-2">{source.nombre}</h3>
+      <p className="text-slate-400 text-sm mb-6 leading-relaxed">{source.descripcion}</p>
+      <div className="flex items-center text-xs font-bold text-green-400 opacity-0 group-hover:opacity-100 transition-opacity">
+        VER FUENTE OFICIAL <ExternalLink className="ml-2 h-3 w-3" />
+      </div>
+    </motion.a>
+  )
+}
+
+const fuentes = [
+  { nombre: "Ministerio de Economía", url: "https://www.economiayfinanzas.gob.bo", icono: <Building2 />, descripcion: "Gestión de deuda y presupuesto TGN." },
+  { nombre: "YPFB Corporación", url: "https://www.ypfb.gob.bo", icono: <Activity />, descripcion: "Hidrocarburos y exportación de gas." },
+  { nombre: "INE Bolivia", url: "https://www.ine.gob.bo", icono: <Database />, descripcion: "PIB, Inflación y Censo económico." },
+  { nombre: "Banco Central (BCB)", url: "https://www.bcb.gob.bo", icono: <DollarSign />, descripcion: "Reservas Internacionales y Política Monetaria." },
+]

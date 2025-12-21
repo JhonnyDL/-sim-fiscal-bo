@@ -139,10 +139,11 @@ export async function simularMonteCarlo(
  * Obtiene los parámetros por defecto del backend
  */
 export async function obtenerParametrosDefault(): Promise<ParametrosSimulacionType> {
+  console.log("[v0] Solicitando parámetros por defecto al backend...")
   const response = await fetch(`${API_BASE_URL}/api/parametros-default`)
 
   if (!response.ok) {
-    throw new Error("Error al obtener parámetros por defecto")
+    throw new Error("Error al obtener parámetros por defecto del backend")
   }
 
   return response.json()
@@ -163,51 +164,66 @@ export async function verificarBackend(): Promise<boolean> {
   }
 }
 
-// Parámetros por defecto locales (fallback si backend no está disponible)
-export const PARAMETROS_DEFAULT: ParametrosSimulacionType = {
-  anos: 6,
-  precio_gas: 4.2,
-  volumen_gas: 2800,
-  precio_zinc: 2850,
-  volumen_zinc: 480,
-  precio_estano: 26000,
-  volumen_estano: 19,
-  precio_oro: 1950,
-  volumen_oro: 38,
-  precio_plata: 25,
-  volumen_plata: 1300,
-  precio_litio: 19000,
-  volumen_litio: 28,
-  iva: 8900,
-  iva_activo: true,
-  iue: 2950,
-  iue_activo: true,
-  it: 1700,
-  it_activo: true,
-  itf: 480,
-  itf_activo: true,
-  rc_iva: 3400,
-  rc_iva_activo: true,
-  ice: 920,
-  ice_activo: true,
-  ga: 1280,
-  ga_activo: true,
-  sueldos_salarios: 14200,
-  bienes_servicios: 8900,
-  inversion_publica: 6200,
-  subsidio_combustibles: 3100,
-  subsidio_combustibles_activo: true,
-  subsidio_alimentos: 1050,
-  subsidio_alimentos_activo: true,
-  deuda_inicial: 45000,
-  deuda_externa_inicial: 29000,
-  deuda_interna_inicial: 16000,
-  tasa_interes_externa: 0.043,
-  tasa_interes_interna: 0.031,
-  rin_inicial: 1920,
-  pib_inicial: 42000,
-  crecimiento_pib: 3.2,
-  inflacion: 1.5,
-  tipo_cambio: 6.96,
-  importaciones_base: 10200,
+/**
+ * Exporta los resultados de la simulación a formato Excel
+ */
+export async function exportarExcel(data: {
+  parametros_iniciales: ParametrosSimulacionType
+  resultados: ResultadoAnual[]
+  pasos: PasoSimulacion[]
+}) {
+  const response = await fetch("/api/exportar/excel", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  })
+
+  if (!response.ok) {
+    throw new Error("Error al exportar a Excel")
+  }
+
+  // Descargar el archivo
+  const blob = await response.blob()
+  const url = window.URL.createObjectURL(blob)
+  const a = document.createElement("a")
+  a.href = url
+  a.download = `simulacion_fiscal_bolivia_${new Date().toISOString().split("T")[0]}.xlsx`
+  document.body.appendChild(a)
+  a.click()
+  window.URL.revokeObjectURL(url)
+  document.body.removeChild(a)
+}
+
+/**
+ * Exporta los resultados de la simulación a formato PDF
+ */
+export async function exportarPDF(data: {
+  parametros_iniciales: ParametrosSimulacionType
+  resultados: ResultadoAnual[]
+  pasos: PasoSimulacion[]
+}) {
+  const response = await fetch("/api/exportar/pdf", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  })
+
+  if (!response.ok) {
+    throw new Error("Error al exportar a PDF")
+  }
+
+  // Descargar el archivo
+  const blob = await response.blob()
+  const url = window.URL.createObjectURL(blob)
+  const a = document.createElement("a")
+  a.href = url
+  a.download = `reporte_fiscal_bolivia_${new Date().toISOString().split("T")[0]}.pdf`
+  document.body.appendChild(a)
+  a.click()
+  window.URL.revokeObjectURL(url)
+  document.body.removeChild(a)
 }

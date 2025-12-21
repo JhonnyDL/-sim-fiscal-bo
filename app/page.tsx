@@ -1,6 +1,5 @@
 "use client"
 import LandingPage from "@/components/landing-page"
-
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -28,12 +27,8 @@ import {
   ESCENARIOS_SHOCKS,
   type ResultadoMonteCarloComplete,
 } from "@/lib/types"
-import { simularFiscal, simularMonteCarlo } from "@/lib/api"
-import {
-  EditorParametrosAvanzados,
-  PARAMETROS_MODELO_DEFAULT,
-  type ParametrosModelo,
-} from "@/components/editor-parametros-avanzados"
+import { simularFiscal, simularMonteCarlo, exportarExcel, exportarPDF, obtenerParametrosDefault } from "@/lib/api"
+import { EditorParametrosAvanzados, type ParametrosModelo } from "@/components/editor-parametros-avanzados"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
@@ -46,7 +41,9 @@ const VERDE_BOLIVIA = "#007A3D"
 export default function Page() {
   const [mostrarLanding, setMostrarLanding] = useState(true)
   const [activeTab, setActiveTab] = useState<string>("parametrizacion")
-  const [parametros, setParametros] = useState<ParametrosModelo>(PARAMETROS_MODELO_DEFAULT)
+  const [parametros, setParametros] = useState<ParametrosModelo | null>(null)
+  const [parametrosDefault, setParametrosDefault] = useState<ParametrosModelo | null>(null)
+  const [cargandoParametros, setCargandoParametros] = useState(true)
   const [resultados, setResultados] = useState<ResultadoAnual[] | null>(null)
   const [pasos, setPasos] = useState<PasoSimulacion[]>([])
   const [simulando, setSimulando] = useState(false)
@@ -58,13 +55,38 @@ export default function Page() {
   const [numSimulacionesMC, setNumSimulacionesMC] = useState(1000)
   const [resultadosMonteCarlo, setResultadosMonteCarlo] = useState<ResultadoMonteCarloComplete | null>(null)
 
+  useEffect(() => {
+    const cargarParametrosDefault = async () => {
+      try {
+        console.log("[v0] Cargando parámetros por defecto desde el backend...")
+        const parametrosBackend = await obtenerParametrosDefault()
+        console.log("[v0] Parámetros cargados:", parametrosBackend)
+        setParametrosDefault(parametrosBackend)
+        setParametros(parametrosBackend)
+      } catch (error) {
+        console.error("[v0] Error al cargar parámetros del backend:", error)
+        alert("Error al cargar los parámetros por defecto. Verifica que el backend esté funcionando.")
+      } finally {
+        setCargandoParametros(false)
+      }
+    }
+
+    cargarParametrosDefault()
+  }, [])
+
   const aplicarEscenario = (escenario: string) => {
+    if (!parametros) return
     console.log("[v0] Aplicando escenario:", escenario)
     setParametros({ ...parametros, ...ESCENARIOS_SHOCKS[escenario as keyof typeof ESCENARIOS_SHOCKS].shocks })
     setEscenarioSeleccionado(escenario)
   }
 
   const ejecutarSimulacion = async () => {
+    if (!parametros) {
+      alert("Los parámetros aún no se han cargado. Espera un momento e intenta nuevamente.")
+      return
+    }
+
     setSimulando(true)
     setAnoVisualizacion(0)
     setResultadosMonteCarlo(null)
@@ -90,13 +112,15 @@ export default function Page() {
   }
 
   const resetear = () => {
-    setParametros(PARAMETROS_MODELO_DEFAULT)
-    setResultados(null)
-    setPasos([])
-    setAnoVisualizacion(0)
-    setAutoPlay(false)
-    setEscenarioSeleccionado(null)
-    setResultadosMonteCarlo(null)
+    if (parametrosDefault) {
+      setParametros(parametrosDefault)
+      setResultados(null)
+      setPasos([])
+      setAnoVisualizacion(0)
+      setAutoPlay(false)
+      setEscenarioSeleccionado(null)
+      setResultadosMonteCarlo(null)
+    }
   }
 
   const avanzarAno = () => {
@@ -133,9 +157,25 @@ export default function Page() {
       setAutoPlay(false)
     }
   }, [autoPlay, anoVisualizacion, resultados, velocidadAutoPlay])
+
+  if (cargandoParametros || !parametros) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background flex items-center justify-center">
+        <Card className="p-8 shadow-lg">
+          <div className="flex flex-col items-center gap-4">
+            <Loader2 className="h-12 w-12 animate-spin text-primary" />
+            <p className="text-lg font-semibold">Cargando parámetros del modelo...</p>
+            <p className="text-sm text-muted-foreground">Conectando con el backend</p>
+          </div>
+        </Card>
+      </div>
+    )
+  }
+
   if (mostrarLanding) {
     return <LandingPage onIniciar={() => setMostrarLanding(false)} />
   }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background relative overflow-hidden">
       <div className="absolute inset-0 opacity-5 pointer-events-none">
@@ -346,7 +386,12 @@ export default function Page() {
               </div>
             </Card>
 
-            <EditorParametrosAvanzados parametros={parametros} onParametrosChange={setParametros} />
+            <EditorParametrosAvanzados
+              parametros={parametros}
+              onParametrosChange={setParametros}
+              onResetearParametros={resetear}
+              parametrosDefault={parametrosDefault}
+            />
           </TabsContent>
 
           <TabsContent value="dashboard" className="space-y-6 animate-fade-in">
@@ -641,8 +686,20 @@ export default function Page() {
                     </p>
                     <Button
                       className="w-full shadow-md hover:shadow-lg transition-all"
-                      onClick={() => console.log("Exportar Excel")}
-                      disabled={true}
+                      onClick={async () => {
+                        if (!resultados) return
+                        try {
+                          await exportarExcel({
+                            parametros_iniciales: parametros,
+                            resultados: resultados,
+                            pasos: pasos,
+                          })
+                        } catch (error) {
+                          console.error("Error al exportar Excel:", error)
+                          alert("Error al exportar el archivo Excel")
+                        }
+                      }}
+                      disabled={!resultados}
                     >
                       Descargar Excel
                     </Button>
@@ -655,8 +712,20 @@ export default function Page() {
                     <Button
                       className="w-full shadow-md hover:shadow-lg transition-all"
                       variant="secondary"
-                      onClick={() => console.log("Exportar PDF")}
-                      disabled={true}
+                      onClick={async () => {
+                        if (!resultados) return
+                        try {
+                          await exportarPDF({
+                            parametros_iniciales: parametros,
+                            resultados: resultados,
+                            pasos: pasos,
+                          })
+                        } catch (error) {
+                          console.error("Error al exportar PDF:", error)
+                          alert("Error al exportar el archivo PDF")
+                        }
+                      }}
+                      disabled={!resultados}
                     >
                       Descargar PDF
                     </Button>

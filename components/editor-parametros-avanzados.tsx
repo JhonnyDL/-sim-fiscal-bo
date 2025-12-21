@@ -132,134 +132,22 @@ export interface ParametrosModeloCompleto {
   subsidio_combustibles_activo: boolean
 }
 
-export const PARAMETROS_MODELO_DEFAULT: ParametrosModeloCompleto = {
-  // Básicos (RF1)
-  anos: 6,
-  pib_inicial: 420000,
-  crecimiento_pib: 3.2,
-  deuda_externa_inicial: 100000,
-  deuda_interna_inicial: 50000,
-  tasa_interes_externa: 4.3,
-  tasa_interes_interna: 3.1,
-  rin_inicial: 3500,
-
-  // Compatibilidad
-  deuda_inicial: 150000,
-  tasa_interes: 4.3,
-
-  // Shocks (RF2)
-  shock_tc: 0,
-  shock_precio_gas: 0,
-  shock_precio_oro: 0,
-  shock_precio_plata: 0,
-  shock_precio_zinc: 0,
-  shock_precio_estano: 0,
-  shock_precio_plomo: 0,
-
-  // Tipo de Cambio: TC = 12.4125 + 1.835528988*Z (RF3)
-  tc_base: 12.4125,
-  tc_coef_z: 1.835528988,
-
-  // Gas Natural (RF4)
-  gas_volumen_base: 16515000,
-  gas_volumen_coef_z: 6202447.464,
-  gas_precio_base: 871.208,
-  gas_precio_coef_z: 729.0108468,
-  gas_tasa_idh: 32,
-  gas_tasa_regalias: 18,
-
-  // Oro (RF4)
-  oro_volumen_base: 33.86,
-  oro_volumen_coef_z: 17.43482148,
-  oro_precio_base: 62377907.29,
-  oro_precio_coef_z: 8328119.788,
-  oro_tasa_regalias: 12,
-
-  // Plata (RF4)
-  plata_volumen_base: 1227.708333,
-  plata_volumen_coef_z: 146.1280268,
-  plata_precio_base: 864265.5598,
-  plata_precio_coef_z: 260978.7337,
-  plata_tasa_regalias: 12,
-
-  // Zinc (RF4)
-  zinc_volumen_base: 469430.4,
-  zinc_volumen_coef_z: 67671.09523,
-  zinc_precio_base: 2826.32284,
-  zinc_precio_coef_z: 427.3211028,
-  zinc_tasa_regalias: 12,
-
-  // Estaño (RF4)
-  estano_volumen_base: 16195.4,
-  estano_volumen_coef_z: 3060.343739,
-  estano_precio_base: 27438.70052,
-  estano_precio_coef_z: 6279.561218,
-  estano_tasa_regalias: 12,
-
-  // Plomo (RF4)
-  plomo_volumen_base: 90045,
-  plomo_volumen_coef_z: 19231.45031,
-  plomo_precio_base: 2081.16128,
-  plomo_precio_coef_z: 148.3825547,
-  plomo_tasa_regalias: 12,
-
-  // Impuestos (RF5)
-  iva_mi_base: 9946000000,
-  iva_mi_coef_z: 1048843554,
-  iue_base: 8053000000,
-  iue_coef_z: 1504402074,
-  it_base: 5336333333,
-  it_coef_z: 811801125.1,
-  ice_mi_base: 1826333333,
-  ice_mi_coef_z: 202134278.8,
-  rc_iva_base: 633500000,
-  rc_iva_coef_z: 230075422.4,
-  itf_base: 433666666.7,
-  itf_coef_z: 128233640.9,
-  ij_base: 48000000,
-  ij_coef_z: 20386269.89,
-  cv_base: 4110000000,
-  cv_coef_z: 1427622359,
-  ga_base: 3473166667,
-  ga_coef_z: 833990987.2,
-  iva_i_base: 10566333333,
-  iva_i_coef_z: 2157826468,
-  ice_i_base: 761666666.7,
-  ice_i_coef_z: 120392137.1,
-  iehd_mi_base: 2200333333,
-  iehd_mi_coef_z: 275045935.6,
-  iehd_i_base: 3266666.67,
-  iehd_i_coef_z: 17305105.22,
-
-  // Gastos (RF6)
-  gasto_corriente_base: 111953166667,
-  gasto_corriente_coef_z: 13443318019,
-  subsidio_alimentos_base: 401142857.1,
-  subsidio_alimentos_coef_z: 238077318.4,
-
-  // Subsidio Combustibles (RF7)
-  gasolina_precio_importacion_base: 961.0769231,
-  gasolina_precio_importacion_coef_z: 188.465191,
-  gasolina_volumen_importacion_base: 439256.5537,
-  gasolina_volumen_importacion_coef_z: 318706.3029,
-  gasolina_precio_venta_domestico: 4986.67,
-
-  diesel_precio_importacion_base: 812.6923077,
-  diesel_precio_importacion_coef_z: 170.6858262,
-  diesel_volumen_importacion_base: 1194994.527,
-  diesel_volumen_importacion_coef_z: 519808.993,
-  diesel_precio_venta_domestico: 4376.47,
-
-  // Nuevo flag
-  subsidio_combustibles_activo: true,
-}
+// CHANGE: Eliminando PARAMETROS_MODELO_DEFAULT hardcodeado - ahora se carga desde el backend
+export type ParametrosModelo = ParametrosModeloCompleto
 
 interface EditorParametrosAvanzadosProps {
-  parametros: ParametrosModeloCompleto
-  onParametrosChange: (parametros: ParametrosModeloCompleto) => void
+  parametros: ParametrosModelo
+  onParametrosChange: (parametros: ParametrosModelo) => void
+  onResetearParametros?: () => void
+  parametrosDefault: ParametrosModelo
 }
 
-export function EditorParametrosAvanzados({ parametros, onParametrosChange }: EditorParametrosAvanzadosProps) {
+export function EditorParametrosAvanzados({
+  parametros,
+  onParametrosChange,
+  onResetearParametros,
+  parametrosDefault,
+}: EditorParametrosAvanzadosProps) {
   const [tab, setTab] = useState("rf1")
 
   const handleChange = (key: keyof ParametrosModeloCompleto, value: number) => {
@@ -274,125 +162,131 @@ export function EditorParametrosAvanzados({ parametros, onParametrosChange }: Ed
   const resetearGrupo = (grupo: string) => {
     const defaults: Record<string, Partial<ParametrosModeloCompleto>> = {
       rf1: {
-        anos: PARAMETROS_MODELO_DEFAULT.anos,
-        pib_inicial: PARAMETROS_MODELO_DEFAULT.pib_inicial,
-        crecimiento_pib: PARAMETROS_MODELO_DEFAULT.crecimiento_pib,
-        deuda_externa_inicial: PARAMETROS_MODELO_DEFAULT.deuda_externa_inicial,
-        deuda_interna_inicial: PARAMETROS_MODELO_DEFAULT.deuda_interna_inicial,
-        tasa_interes_externa: PARAMETROS_MODELO_DEFAULT.tasa_interes_externa,
-        tasa_interes_interna: PARAMETROS_MODELO_DEFAULT.tasa_interes_interna,
-        rin_inicial: PARAMETROS_MODELO_DEFAULT.rin_inicial,
+        anos: parametrosDefault.anos,
+        pib_inicial: parametrosDefault.pib_inicial,
+        crecimiento_pib: parametrosDefault.crecimiento_pib,
+        deuda_externa_inicial: parametrosDefault.deuda_externa_inicial,
+        deuda_interna_inicial: parametrosDefault.deuda_interna_inicial,
+        tasa_interes_externa: parametrosDefault.tasa_interes_externa,
+        tasa_interes_interna: parametrosDefault.tasa_interes_interna,
+        rin_inicial: parametrosDefault.rin_inicial,
       },
       // RF2: Shocks
       rf2: {
-        shock_tc: PARAMETROS_MODELO_DEFAULT.shock_tc,
-        shock_precio_gas: PARAMETROS_MODELO_DEFAULT.shock_precio_gas,
-        shock_precio_oro: PARAMETROS_MODELO_DEFAULT.shock_precio_oro,
-        shock_precio_plata: PARAMETROS_MODELO_DEFAULT.shock_precio_plata,
-        shock_precio_zinc: PARAMETROS_MODELO_DEFAULT.shock_precio_zinc,
-        shock_precio_estano: PARAMETROS_MODELO_DEFAULT.shock_precio_estano,
-        shock_precio_plomo: PARAMETROS_MODELO_DEFAULT.shock_precio_plomo,
+        shock_tc: parametrosDefault.shock_tc,
+        shock_precio_gas: parametrosDefault.shock_precio_gas,
+        shock_precio_oro: parametrosDefault.shock_precio_oro,
+        shock_precio_plata: parametrosDefault.shock_precio_plata,
+        shock_precio_zinc: parametrosDefault.shock_precio_zinc,
+        shock_precio_estano: parametrosDefault.shock_precio_estano,
+        shock_precio_plomo: parametrosDefault.shock_precio_plomo,
       },
       // RF3: Tipo de Cambio
       tc: {
-        tc_base: PARAMETROS_MODELO_DEFAULT.tc_base,
-        tc_coef_z: PARAMETROS_MODELO_DEFAULT.tc_coef_z,
+        tc_base: parametrosDefault.tc_base,
+        tc_coef_z: parametrosDefault.tc_coef_z,
       },
       // RF4: Recursos Naturales
       commodities: {
         // Gas Natural
-        gas_volumen_base: PARAMETROS_MODELO_DEFAULT.gas_volumen_base,
-        gas_volumen_coef_z: PARAMETROS_MODELO_DEFAULT.gas_volumen_coef_z,
-        gas_precio_base: PARAMETROS_MODELO_DEFAULT.gas_precio_base,
-        gas_precio_coef_z: PARAMETROS_MODELO_DEFAULT.gas_precio_coef_z,
-        gas_tasa_idh: PARAMETROS_MODELO_DEFAULT.gas_tasa_idh,
-        gas_tasa_regalias: PARAMETROS_MODELO_DEFAULT.gas_tasa_regalias,
+        gas_volumen_base: parametrosDefault.gas_volumen_base,
+        gas_volumen_coef_z: parametrosDefault.gas_volumen_coef_z,
+        gas_precio_base: parametrosDefault.gas_precio_base,
+        gas_precio_coef_z: parametrosDefault.gas_precio_coef_z,
+        gas_tasa_idh: parametrosDefault.gas_tasa_idh,
+        gas_tasa_regalias: parametrosDefault.gas_tasa_regalias,
         // Oro
-        oro_volumen_base: PARAMETROS_MODELO_DEFAULT.oro_volumen_base,
-        oro_volumen_coef_z: PARAMETROS_MODELO_DEFAULT.oro_volumen_coef_z,
-        oro_precio_base: PARAMETROS_MODELO_DEFAULT.oro_precio_base,
-        oro_precio_coef_z: PARAMETROS_MODELO_DEFAULT.oro_precio_coef_z,
-        oro_tasa_regalias: PARAMETROS_MODELO_DEFAULT.oro_tasa_regalias,
+        oro_volumen_base: parametrosDefault.oro_volumen_base,
+        oro_volumen_coef_z: parametrosDefault.oro_volumen_coef_z,
+        oro_precio_base: parametrosDefault.oro_precio_base,
+        oro_precio_coef_z: parametrosDefault.oro_precio_coef_z,
+        oro_tasa_regalias: parametrosDefault.oro_tasa_regalias,
         // Plata
-        plata_volumen_base: PARAMETROS_MODELO_DEFAULT.plata_volumen_base,
-        plata_volumen_coef_z: PARAMETROS_MODELO_DEFAULT.plata_volumen_coef_z,
-        plata_precio_base: PARAMETROS_MODELO_DEFAULT.plata_precio_base,
-        plata_precio_coef_z: PARAMETROS_MODELO_DEFAULT.plata_precio_coef_z,
-        plata_tasa_regalias: PARAMETROS_MODELO_DEFAULT.plata_tasa_regalias,
+        plata_volumen_base: parametrosDefault.plata_volumen_base,
+        plata_volumen_coef_z: parametrosDefault.plata_volumen_coef_z,
+        plata_precio_base: parametrosDefault.plata_precio_base,
+        plata_precio_coef_z: parametrosDefault.plata_precio_coef_z,
+        plata_tasa_regalias: parametrosDefault.plata_tasa_regalias,
         // Zinc
-        zinc_volumen_base: PARAMETROS_MODELO_DEFAULT.zinc_volumen_base,
-        zinc_volumen_coef_z: PARAMETROS_MODELO_DEFAULT.zinc_volumen_coef_z,
-        zinc_precio_base: PARAMETROS_MODELO_DEFAULT.zinc_precio_base,
-        zinc_precio_coef_z: PARAMETROS_MODELO_DEFAULT.zinc_precio_coef_z,
-        zinc_tasa_regalias: PARAMETROS_MODELO_DEFAULT.zinc_tasa_regalias,
+        zinc_volumen_base: parametrosDefault.zinc_volumen_base,
+        zinc_volumen_coef_z: parametrosDefault.zinc_volumen_coef_z,
+        zinc_precio_base: parametrosDefault.zinc_precio_base,
+        zinc_precio_coef_z: parametrosDefault.zinc_precio_coef_z,
+        zinc_tasa_regalias: parametrosDefault.zinc_tasa_regalias,
         // Estaño
-        estano_volumen_base: PARAMETROS_MODELO_DEFAULT.estano_volumen_base,
-        estano_volumen_coef_z: PARAMETROS_MODELO_DEFAULT.estano_volumen_coef_z,
-        estano_precio_base: PARAMETROS_MODELO_DEFAULT.estano_precio_base,
-        estano_precio_coef_z: PARAMETROS_MODELO_DEFAULT.estano_precio_coef_z,
-        estano_tasa_regalias: PARAMETROS_MODELO_DEFAULT.estano_tasa_regalias,
+        estano_volumen_base: parametrosDefault.estano_volumen_base,
+        estano_volumen_coef_z: parametrosDefault.estano_volumen_coef_z,
+        estano_precio_base: parametrosDefault.estano_precio_base,
+        estano_precio_coef_z: parametrosDefault.estano_precio_coef_z,
+        estano_tasa_regalias: parametrosDefault.estano_tasa_regalias,
         // Plomo
-        plomo_volumen_base: PARAMETROS_MODELO_DEFAULT.plomo_volumen_base,
-        plomo_volumen_coef_z: PARAMETROS_MODELO_DEFAULT.plomo_volumen_coef_z,
-        plomo_precio_base: PARAMETROS_MODELO_DEFAULT.plomo_precio_base,
-        plomo_precio_coef_z: PARAMETROS_MODELO_DEFAULT.plomo_precio_coef_z,
-        plomo_tasa_regalias: PARAMETROS_MODELO_DEFAULT.plomo_tasa_regalias,
+        plomo_volumen_base: parametrosDefault.plomo_volumen_base,
+        plomo_volumen_coef_z: parametrosDefault.plomo_volumen_coef_z,
+        plomo_precio_base: parametrosDefault.plomo_precio_base,
+        plomo_precio_coef_z: parametrosDefault.plomo_precio_coef_z,
+        plomo_tasa_regalias: parametrosDefault.plomo_tasa_regalias,
       },
       // RF5: Impuestos
       impuestos: {
-        iva_mi_base: PARAMETROS_MODELO_DEFAULT.iva_mi_base,
-        iva_mi_coef_z: PARAMETROS_MODELO_DEFAULT.iva_mi_coef_z,
-        iue_base: PARAMETROS_MODELO_DEFAULT.iue_base,
-        iue_coef_z: PARAMETROS_MODELO_DEFAULT.iue_coef_z,
-        it_base: PARAMETROS_MODELO_DEFAULT.it_base,
-        it_coef_z: PARAMETROS_MODELO_DEFAULT.it_coef_z,
-        ice_mi_base: PARAMETROS_MODELO_DEFAULT.ice_mi_base,
-        ice_mi_coef_z: PARAMETROS_MODELO_DEFAULT.ice_mi_coef_z,
-        rc_iva_base: PARAMETROS_MODELO_DEFAULT.rc_iva_base,
-        rc_iva_coef_z: PARAMETROS_MODELO_DEFAULT.rc_iva_coef_z,
-        itf_base: PARAMETROS_MODELO_DEFAULT.itf_base,
-        itf_coef_z: PARAMETROS_MODELO_DEFAULT.itf_coef_z,
-        ij_base: PARAMETROS_MODELO_DEFAULT.ij_base,
-        ij_coef_z: PARAMETROS_MODELO_DEFAULT.ij_coef_z,
-        cv_base: PARAMETROS_MODELO_DEFAULT.cv_base,
-        cv_coef_z: PARAMETROS_MODELO_DEFAULT.cv_coef_z,
-        ga_base: PARAMETROS_MODELO_DEFAULT.ga_base,
-        ga_coef_z: PARAMETROS_MODELO_DEFAULT.ga_coef_z,
-        iva_i_base: PARAMETROS_MODELO_DEFAULT.iva_i_base,
-        iva_i_coef_z: PARAMETROS_MODELO_DEFAULT.iva_i_coef_z,
-        ice_i_base: PARAMETROS_MODELO_DEFAULT.ice_i_base,
-        ice_i_coef_z: PARAMETROS_MODELO_DEFAULT.ice_i_coef_z,
-        iehd_mi_base: PARAMETROS_MODELO_DEFAULT.iehd_mi_base,
-        iehd_mi_coef_z: PARAMETROS_MODELO_DEFAULT.iehd_mi_coef_z,
-        iehd_i_base: PARAMETROS_MODELO_DEFAULT.iehd_i_base,
-        iehd_i_coef_z: PARAMETROS_MODELO_DEFAULT.iehd_i_coef_z,
+        iva_mi_base: parametrosDefault.iva_mi_base,
+        iva_mi_coef_z: parametrosDefault.iva_mi_coef_z,
+        iue_base: parametrosDefault.iue_base,
+        iue_coef_z: parametrosDefault.iue_coef_z,
+        it_base: parametrosDefault.it_base,
+        it_coef_z: parametrosDefault.it_coef_z,
+        ice_mi_base: parametrosDefault.ice_mi_base,
+        ice_mi_coef_z: parametrosDefault.ice_mi_coef_z,
+        rc_iva_base: parametrosDefault.rc_iva_base,
+        rc_iva_coef_z: parametrosDefault.rc_iva_coef_z,
+        itf_base: parametrosDefault.itf_base,
+        itf_coef_z: parametrosDefault.itf_coef_z,
+        ij_base: parametrosDefault.ij_base,
+        ij_coef_z: parametrosDefault.ij_coef_z,
+        cv_base: parametrosDefault.cv_base,
+        cv_coef_z: parametrosDefault.cv_coef_z,
+        ga_base: parametrosDefault.ga_base,
+        ga_coef_z: parametrosDefault.ga_coef_z,
+        iva_i_base: parametrosDefault.iva_i_base,
+        iva_i_coef_z: parametrosDefault.iva_i_coef_z,
+        ice_i_base: parametrosDefault.ice_i_base,
+        ice_i_coef_z: parametrosDefault.ice_i_coef_z,
+        iehd_mi_base: parametrosDefault.iehd_mi_base,
+        iehd_mi_coef_z: parametrosDefault.iehd_mi_coef_z,
+        iehd_i_base: parametrosDefault.iehd_i_base,
+        iehd_i_coef_z: parametrosDefault.iehd_i_coef_z,
       },
       // RF6: Gastos
       gastos: {
-        gasto_corriente_base: PARAMETROS_MODELO_DEFAULT.gasto_corriente_base,
-        gasto_corriente_coef_z: PARAMETROS_MODELO_DEFAULT.gasto_corriente_coef_z,
-        subsidio_alimentos_base: PARAMETROS_MODELO_DEFAULT.subsidio_alimentos_base,
-        subsidio_alimentos_coef_z: PARAMETROS_MODELO_DEFAULT.subsidio_alimentos_coef_z,
+        gasto_corriente_base: parametrosDefault.gasto_corriente_base,
+        gasto_corriente_coef_z: parametrosDefault.gasto_corriente_coef_z,
+        subsidio_alimentos_base: parametrosDefault.subsidio_alimentos_base,
+        subsidio_alimentos_coef_z: parametrosDefault.subsidio_alimentos_coef_z,
       },
       // RF7: Combustibles
       combustibles: {
-        gasolina_precio_importacion_base: PARAMETROS_MODELO_DEFAULT.gasolina_precio_importacion_base,
-        gasolina_precio_importacion_coef_z: PARAMETROS_MODELO_DEFAULT.gasolina_precio_importacion_coef_z,
-        gasolina_volumen_importacion_base: PARAMETROS_MODELO_DEFAULT.gasolina_volumen_importacion_base,
-        gasolina_volumen_importacion_coef_z: PARAMETROS_MODELO_DEFAULT.gasolina_volumen_importacion_coef_z,
-        gasolina_precio_venta_domestico: PARAMETROS_MODELO_DEFAULT.gasolina_precio_venta_domestico,
-        diesel_precio_importacion_base: PARAMETROS_MODELO_DEFAULT.diesel_precio_importacion_base,
-        diesel_precio_importacion_coef_z: PARAMETROS_MODELO_DEFAULT.diesel_precio_importacion_coef_z,
-        diesel_volumen_importacion_base: PARAMETROS_MODELO_DEFAULT.diesel_volumen_importacion_base,
-        diesel_volumen_importacion_coef_z: PARAMETROS_MODELO_DEFAULT.diesel_volumen_importacion_coef_z,
-        diesel_precio_venta_domestico: PARAMETROS_MODELO_DEFAULT.diesel_precio_venta_domestico,
+        gasolina_precio_importacion_base: parametrosDefault.gasolina_precio_importacion_base,
+        gasolina_precio_importacion_coef_z: parametrosDefault.gasolina_precio_importacion_coef_z,
+        gasolina_volumen_importacion_base: parametrosDefault.gasolina_volumen_importacion_base,
+        gasolina_volumen_importacion_coef_z: parametrosDefault.gasolina_volumen_importacion_coef_z,
+        gasolina_precio_venta_domestico: parametrosDefault.gasolina_precio_venta_domestico,
+        diesel_precio_importacion_base: parametrosDefault.diesel_precio_importacion_base,
+        diesel_precio_importacion_coef_z: parametrosDefault.diesel_precio_importacion_coef_z,
+        diesel_volumen_importacion_base: parametrosDefault.diesel_volumen_importacion_base,
+        diesel_volumen_importacion_coef_z: parametrosDefault.diesel_volumen_importacion_coef_z,
+        diesel_precio_venta_domestico: parametrosDefault.diesel_precio_venta_domestico,
         // Nuevo: resetear el flag de subsidio de combustibles
-        subsidio_combustibles_activo: PARAMETROS_MODELO_DEFAULT.subsidio_combustibles_activo,
+        subsidio_combustibles_activo: parametrosDefault.subsidio_combustibles_activo,
       },
     }
 
     if (defaults[grupo]) {
       onParametrosChange({ ...parametros, ...defaults[grupo] })
+    }
+  }
+
+  const handleResetAll = () => {
+    if (onResetearParametros) {
+      onResetearParametros()
     }
   }
 
@@ -406,18 +300,13 @@ export function EditorParametrosAvanzados({ parametros, onParametrosChange }: Ed
               <Settings2 className="h-6 w-6 text-primary" />
             </div>
             <div>
-              <CardTitle className="text-2xl font-bold">Editor de Parámetros Avanzados</CardTitle>
+              <CardTitle className="text-2xl font-bold">Editor de Parámetros</CardTitle>
               <p className="text-sm text-muted-foreground mt-1">
                 Configura todos los coeficientes del modelo estocástico
               </p>
             </div>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onParametrosChange(PARAMETROS_MODELO_DEFAULT)}
-            className="shadow-sm"
-          >
+          <Button variant="outline" size="sm" onClick={handleResetAll} className="shadow-sm bg-transparent">
             <RotateCcw className="mr-2 h-4 w-4" />
             Resetear Todo
           </Button>
