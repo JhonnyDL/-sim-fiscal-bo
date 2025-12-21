@@ -1,7 +1,8 @@
 from typing import List, Dict, Optional
 import random
-from schemas import ParametrosSimulacion, ResultadoAnual, PasoSimulacion, ResultadoSimulacion
-from fiscal_model import calcular_ingresos, calcular_gastos, calcular_deficit_deuda
+from schemas import ParametrosSimulacion, ResultadoAnual, PasoSimulacion, ResultadoSimulacion, ResultadoMonteCarloAnual, EstadisticasVariable, ResultadoMonteCarloComplete
+from fiscal_model import calcular_ingresos, calcular_gastos, calcular_indicadores, calcular_deficit_deuda
+from stochastic import aplicar_volatilidad_precios, simular_shock
 
 class SimuladorFiscalBolivia:
     """
@@ -153,3 +154,116 @@ class SimuladorFiscalBolivia:
             resultados=resultados,
             pasos=self.pasos
         )
+    
+    def simular_monte_carlo(self, anos: int, num_simulaciones: int = 1000) -> 'ResultadoMonteCarloComplete':
+        """
+        Ejecuta múltiples simulaciones Monte Carlo para obtener distribuciones de probabilidad
+        
+        Args:
+            anos: Número de años a simular
+            num_simulaciones: Número de simulaciones a ejecutar (default: 1000)
+            
+        Returns:
+            ResultadoMonteCarloComplete con estadísticas y distribuciones
+        """
+        
+        # Almacenar todas las simulaciones
+        todas_las_simulaciones: List[List[ResultadoAnual]] = []
+        
+        print(f"Ejecutando {num_simulaciones} simulaciones Monte Carlo...")
+        
+        for sim_num in range(num_simulaciones):
+            # Ejecutar una simulación completa
+            resultado = self.simular(anos)
+            todas_las_simulaciones.append(resultado.resultados)
+            
+            if (sim_num + 1) % 100 == 0:
+                print(f"  Completadas {sim_num + 1}/{num_simulaciones} simulaciones")
+        
+        # Calcular estadísticas año por año
+        resultados_mc: List[ResultadoMonteCarloAnual] = []
+        
+        for ano_idx in range(anos):
+            ano_actual = 2020 + ano_idx
+            
+            # Recolectar valores de todas las simulaciones para este año
+            valores = {
+                'ingresos_totales': [],
+                'gastos_totales': [],
+                'deficit_superavit': [],
+                'deuda_total': [],
+                'deuda_pib_ratio': [],
+                'rin': [],
+                'rin_meses_importacion': [],
+                'deficit_pib_ratio': [],
+                'presion_tributaria': [],
+                'ing_gas': [],
+                'ing_mineria_total': [],
+                'ing_iva': [],
+                'ing_iue': [],
+                'gasto_subsidio_combustibles': [],
+            }
+            
+            for sim in todas_las_simulaciones:
+                resultado_ano = sim[ano_idx]
+                for key in valores.keys():
+                    valores[key].append(getattr(resultado_ano, key))
+            
+            # Calcular estadísticas para cada variable
+            def calcular_estadisticas(datos: List[float]) -> EstadisticasVariable:
+                import numpy as np
+                datos_array = np.array(datos)
+                return EstadisticasVariable(
+                    promedio=float(np.mean(datos_array)),
+                    mediana=float(np.median(datos_array)),
+                    desviacion_estandar=float(np.std(datos_array)),
+                    percentil_5=float(np.percentile(datos_array, 5)),
+                    percentil_25=float(np.percentile(datos_array, 25)),
+                    percentil_75=float(np.percentile(datos_array, 75)),
+                    percentil_95=float(np.percentile(datos_array, 95)),
+                    minimo=float(np.min(datos_array)),
+                    maximo=float(np.max(datos_array))
+                )
+            
+            # Crear resultado para este año
+            resultado_mc_ano = ResultadoMonteCarloAnual(
+                ano=ano_actual,
+                ingresos_totales=calcular_estadisticas(valores['ingresos_totales']),
+                gastos_totales=calcular_estadisticas(valores['gastos_totales']),
+                deficit_superavit=calcular_estadisticas(valores['deficit_superavit']),
+                deuda_total=calcular_estadisticas(valores['deuda_total']),
+                deuda_pib_ratio=calcular_estadisticas(valores['deuda_pib_ratio']),
+                rin=calcular_estadisticas(valores['rin']),
+                rin_meses_importacion=calcular_estadisticas(valores['rin_meses_importacion']),
+                deficit_pib_ratio=calcular_estadisticas(valores['deficit_pib_ratio']),
+                presion_tributaria=calcular_estadisticas(valores['presion_tributaria']),
+                ing_gas=calcular_estadisticas(valores['ing_gas']),
+                ing_mineria_total=calcular_estadisticas(valores['ing_mineria_total']),
+                ing_iva=calcular_estadisticas(valores['ing_iva']),
+                ing_iue=calcular_estadisticas(valores['ing_iue']),
+                gasto_subsidio_combustibles=calcular_estadisticas(valores['gasto_subsidio_combustibles']),
+                # Distribuciones completas para histogramas
+                distribucion_deficit=valores['deficit_superavit'],
+                distribucion_deuda_pib=valores['deuda_pib_ratio'],
+                distribucion_rin=valores['rin']
+            )
+            
+            resultados_mc.append(resultado_mc_ano)
+        
+        # Tomar una simulación representativa (la que está más cerca de la mediana)
+        simulacion_representativa = todas_las_simulaciones[num_simulaciones // 2]
+        
+        return ResultadoMonteCarloComplete(
+            num_simulaciones=num_simulaciones,
+            resultados_estadisticos=resultados_mc,
+            simulacion_representativa=simulacion_representativa,
+            metodo="Monte Carlo con Box-Müller"
+        )
+def aplicar_volatilidad_precios(precio_base: float, volatilidad_pct: float) -> float:
+    """
+    Aplica un cambio estocástico al precio usando volatilidad porcentual.
+    precio_base: precio inicial
+    volatilidad_pct: porcentaje de volatilidad (ej. 5 para ±5%)
+    """
+    cambio = precio_base * volatilidad_pct / 100
+    return precio_base + random.uniform(-cambio, cambio)

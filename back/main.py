@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from schemas import ParametrosSimulacion, ResultadoSimulacion
+from schemas import ParametrosSimulacion, ResultadoSimulacion, ResultadoMonteCarloComplete
 from simulator import SimuladorFiscalBolivia
 import uvicorn
 
@@ -53,6 +53,38 @@ async def simular(parametros: ParametrosSimulacion):
     
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error en la simulación: {str(e)}")
+
+@app.post("/api/simular-monte-carlo")
+async def simular_monte_carlo(parametros: ParametrosSimulacion, num_simulaciones: int = 1000):
+    """
+    Ejecuta simulación Monte Carlo con múltiples iteraciones para obtener distribuciones de probabilidad
+    
+    Args:
+        parametros: Objeto ParametrosSimulacion con todos los parámetros de entrada
+        num_simulaciones: Número de simulaciones a ejecutar (default: 1000)
+        
+    Returns:
+        ResultadoMonteCarloComplete: Estadísticas y distribuciones de resultados
+    """
+    try:
+        # Validar número de simulaciones
+        if num_simulaciones < 100:
+            raise HTTPException(status_code=400, detail="El número mínimo de simulaciones es 100")
+        if num_simulaciones > 10000:
+            raise HTTPException(status_code=400, detail="El número máximo de simulaciones es 10000")
+        
+        # Crear simulador con los parámetros
+        simulador = SimuladorFiscalBolivia(parametros)
+        
+        # Ejecutar simulación Monte Carlo
+        resultado = simulador.simular_monte_carlo(parametros.anos, num_simulaciones)
+        
+        return resultado
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error en la simulación Monte Carlo: {str(e)}")
 
 @app.get("/api/parametros-default")
 def obtener_parametros_default():

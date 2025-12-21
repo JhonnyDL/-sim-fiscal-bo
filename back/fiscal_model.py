@@ -346,3 +346,27 @@ def calcular_deficit_deuda(
         'intereses': intereses_totales,
         'rin': rin
     }
+def calcular_indicadores(parametros, estado_anterior=None):
+    """
+    Calcula los indicadores fiscales clave usando ingresos y gastos.
+    """
+    ingresos = calcular_ingresos(parametros, estado_anterior)
+    gastos = calcular_gastos(parametros, estado_anterior, ingresos['tipo_cambio'], ingresos['z_value'])
+    
+    deficit_deuda = calcular_deficit_deuda(
+        ingresos_totales=ingresos['total'],
+        gastos_totales=gastos['total'],
+        deuda_externa_anterior=estado_anterior.deuda_externa if estado_anterior else 0,
+        deuda_interna_anterior=estado_anterior.deuda_interna if estado_anterior else 0,
+        tasa_interes_externa=parametros.tasa_interes_externa,
+        tasa_interes_interna=parametros.tasa_interes_interna,
+        exportaciones=ingresos['exportaciones_total'],
+        rin_anterior=estado_anterior.rin if estado_anterior else 0,
+        tc=ingresos['tipo_cambio']
+    )
+    
+    return {
+        'ingresos': ingresos,
+        'gastos': gastos,
+        'deficit_deuda': deficit_deuda
+    }

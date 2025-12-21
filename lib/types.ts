@@ -232,3 +232,43 @@ export const ESCENARIOS_SHOCKS = {
     },
   },
 }
+
+export interface EstadisticasVariable {
+  promedio: number
+  mediana: number
+  desviacion_estandar: number
+  percentil_5: number
+  percentil_25: number
+  percentil_75: number
+  percentil_95: number
+  minimo: number
+  maximo: number
+}
+
+export interface ResultadoMonteCarloAnual {
+  ano: number
+  ingresos_totales: EstadisticasVariable
+  gastos_totales: EstadisticasVariable
+  deficit_superavit: EstadisticasVariable
+  deuda_total: EstadisticasVariable
+  deuda_pib_ratio: EstadisticasVariable
+  rin: EstadisticasVariable
+  rin_meses_importacion: EstadisticasVariable
+  deficit_pib_ratio: EstadisticasVariable
+  presion_tributaria: EstadisticasVariable
+  ing_gas: EstadisticasVariable
+  ing_mineria_total: EstadisticasVariable
+  ing_iva: EstadisticasVariable
+  ing_iue: EstadisticasVariable
+  gasto_subsidio_combustibles: EstadisticasVariable
+  distribucion_deficit: number[]
+  distribucion_deuda_pib: number[]
+  distribucion_rin: number[]
+}
+
+export interface ResultadoMonteCarloComplete {
+  num_simulaciones: number
+  resultados_estadisticos: ResultadoMonteCarloAnual[]
+  simulacion_representativa: ResultadoAnual[]
+  metodo: string
+}

@@ -51,3 +51,17 @@ def aplicar_shock(valor: float, shock_pct: float = 0.0) -> float:
     """
     return valor * (1 + shock_pct / 100)
 
+def aplicar_volatilidad_precios(precio_base: float, volatilidad_pct: float) -> float:
+    """
+    Aplica un cambio estocástico al precio usando volatilidad porcentual.
+    precio_base: valor inicial
+    volatilidad_pct: porcentaje de volatilidad (ej. 5 = ±5%)
+    """
+    cambio = precio_base * volatilidad_pct / 100
+    return precio_base + random.uniform(-cambio, cambio)
+
+def simular_shock(valor_base: float, shock_pct: float) -> float:
+    """
+    Aplica un shock simple porcentual al valor
+    """
+    return valor_base * (1 + shock_pct / 100)

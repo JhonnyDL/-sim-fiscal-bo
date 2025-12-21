@@ -22,8 +22,13 @@ import TablaResultados from "@/components/tabla-resultados"
 import GraficosInteractivos from "@/components/graficos-interactivos"
 import DiagramaRelaciones from "@/components/diagrama-relaciones"
 import GraficasDetalladas from "@/components/graficas-detalladas"
-import { type ResultadoAnual, type PasoSimulacion, ESCENARIOS_SHOCKS } from "@/lib/types"
-import { simularFiscal } from "@/lib/api"
+import {
+  type ResultadoAnual,
+  type PasoSimulacion,
+  ESCENARIOS_SHOCKS,
+  type ResultadoMonteCarloComplete,
+} from "@/lib/types"
+import { simularFiscal, simularMonteCarlo } from "@/lib/api"
 import {
   EditorParametrosAvanzados,
   PARAMETROS_MODELO_DEFAULT,
@@ -33,6 +38,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 
 const ROJO_BOLIVIA = "#DA291C"
 const VERDE_BOLIVIA = "#007A3D"
@@ -48,6 +54,9 @@ export default function Page() {
   const [autoPlay, setAutoPlay] = useState(false)
   const [velocidadAutoPlay, setVelocidadAutoPlay] = useState(2000) // milliseconds
   const [escenarioSeleccionado, setEscenarioSeleccionado] = useState<string | null>(null)
+  const [metodoSimulacion, setMetodoSimulacion] = useState<"box-muller" | "monte-carlo">("box-muller")
+  const [numSimulacionesMC, setNumSimulacionesMC] = useState(1000)
+  const [resultadosMonteCarlo, setResultadosMonteCarlo] = useState<ResultadoMonteCarloComplete | null>(null)
 
   const aplicarEscenario = (escenario: string) => {
     console.log("[v0] Aplicando escenario:", escenario)
@@ -58,11 +67,19 @@ export default function Page() {
   const ejecutarSimulacion = async () => {
     setSimulando(true)
     setAnoVisualizacion(0)
+    setResultadosMonteCarlo(null)
 
     try {
-      const resultado = await simularFiscal(parametros)
-      setResultados(resultado.resultados)
-      setPasos(resultado.pasos)
+      if (metodoSimulacion === "box-muller") {
+        const resultado = await simularFiscal(parametros)
+        setResultados(resultado.resultados)
+        setPasos(resultado.pasos)
+      } else {
+        const resultadoMC = await simularMonteCarlo(parametros, numSimulacionesMC)
+        setResultadosMonteCarlo(resultadoMC)
+        setResultados(resultadoMC.simulacion_representativa)
+        setPasos([]) // Monte Carlo no genera pasos detallados
+      }
       setActiveTab("dashboard")
     } catch (error) {
       console.error("Error en simulación:", error)
@@ -79,6 +96,7 @@ export default function Page() {
     setAnoVisualizacion(0)
     setAutoPlay(false)
     setEscenarioSeleccionado(null)
+    setResultadosMonteCarlo(null)
   }
 
   const avanzarAno = () => {
@@ -229,6 +247,85 @@ export default function Page() {
             <Card className="p-6 shadow-lg border-2">
               <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
                 <div className="h-1 w-8 gradient-bolivia rounded-full" />
+                Método de Simulación
+              </h3>
+              <RadioGroup
+                value={metodoSimulacion}
+                onValueChange={(v) => setMetodoSimulacion(v as "box-muller" | "monte-carlo")}
+              >
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div
+                    className={`flex items-start space-x-3 p-4 border-2 rounded-lg cursor-pointer transition-all ${metodoSimulacion === "box-muller"
+                      ? "border-primary bg-primary/5"
+                      : "border-muted hover:border-primary/50"
+                      }`}
+                    onClick={() => setMetodoSimulacion("box-muller")}
+                  >
+                    <RadioGroupItem value="box-muller" id="box-muller" />
+                    <div className="flex-1">
+                      <Label htmlFor="box-muller" className="cursor-pointer font-semibold text-base">
+                        Box-Müller (Simulación Única)
+                      </Label>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Genera una trayectoria usando el algoritmo Box-Müller para variables aleatorias normales. Rápido
+                        y eficiente para análisis individual.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div
+                    className={`flex items-start space-x-3 p-4 border-2 rounded-lg cursor-pointer transition-all ${metodoSimulacion === "monte-carlo"
+                      ? "border-primary bg-primary/5"
+                      : "border-muted hover:border-primary/50"
+                      }`}
+                    onClick={() => setMetodoSimulacion("monte-carlo")}
+                  >
+                    <RadioGroupItem value="monte-carlo" id="monte-carlo" />
+                    <div className="flex-1">
+                      <Label htmlFor="monte-carlo" className="cursor-pointer font-semibold text-base">
+                        Monte Carlo (Múltiples Iteraciones)
+                      </Label>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Ejecuta múltiples simulaciones para obtener distribuciones de probabilidad y estadísticas (P5,
+                        P50, P95). Más completo pero más lento.
+                      </p>
+                      {metodoSimulacion === "monte-carlo" && (
+                        <div className="mt-3 flex items-center gap-2">
+                          <Label htmlFor="num-sims" className="text-sm whitespace-nowrap">
+                            Iteraciones:
+                          </Label>
+                          <Input
+                            id="num-sims"
+                            type="number"
+                            min={100}
+                            max={10000}
+                            step={100}
+                            value={numSimulacionesMC}
+                            onChange={(e) => setNumSimulacionesMC(Number(e.target.value) || 1000)}
+                            className="w-24"
+                          />
+                          <span className="text-xs text-muted-foreground">(100-10,000)</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </RadioGroup>
+
+              {metodoSimulacion === "monte-carlo" && (
+                <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                  <p className="text-sm text-blue-900">
+                    <strong>Nota:</strong> El método Monte Carlo ejecutará {numSimulacionesMC.toLocaleString()}{" "}
+                    simulaciones independientes usando Box-Müller para cada una. Esto puede tomar varios segundos
+                    dependiendo del número de iteraciones.
+                  </p>
+                </div>
+              )}
+            </Card>
+
+            <Card className="p-6 shadow-lg border-2">
+              <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+                <div className="h-1 w-8 gradient-bolivia rounded-full" />
                 Escenarios Predefinidos
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
@@ -255,6 +352,86 @@ export default function Page() {
           <TabsContent value="dashboard" className="space-y-6 animate-fade-in">
             {resultados && (
               <>
+                {resultadosMonteCarlo && (
+                  <Card className="p-6 shadow-lg border-2 bg-gradient-to-br from-blue-50 to-purple-50">
+                    <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+                      <div className="h-1 w-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full" />
+                      Resultados Monte Carlo ({resultadosMonteCarlo.num_simulaciones.toLocaleString()} simulaciones)
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      {(() => {
+                        const stats = resultadosMonteCarlo.resultados_estadisticos[anoVisualizacion]
+                        return (
+                          <>
+                            <div className="bg-white p-4 rounded-lg border-2 border-blue-200">
+                              <p className="text-sm text-blue-700 font-medium mb-2">Déficit/Superávit</p>
+                              <div className="space-y-1 text-xs">
+                                <div className="flex justify-between">
+                                  <span className="text-gray-600">P5 (optimista):</span>
+                                  <span className="font-mono">${stats.deficit_superavit.percentil_5.toFixed(0)}M</span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span className="text-gray-600">P50 (mediana):</span>
+                                  <span className="font-mono font-bold">
+                                    ${stats.deficit_superavit.mediana.toFixed(0)}M
+                                  </span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span className="text-gray-600">P95 (pesimista):</span>
+                                  <span className="font-mono">${stats.deficit_superavit.percentil_95.toFixed(0)}M</span>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="bg-white p-4 rounded-lg border-2 border-purple-200">
+                              <p className="text-sm text-purple-700 font-medium mb-2">Deuda/PIB %</p>
+                              <div className="space-y-1 text-xs">
+                                <div className="flex justify-between">
+                                  <span className="text-gray-600">P5 (optimista):</span>
+                                  <span className="font-mono">{stats.deuda_pib_ratio.percentil_5.toFixed(1)}%</span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span className="text-gray-600">P50 (mediana):</span>
+                                  <span className="font-mono font-bold">
+                                    {stats.deuda_pib_ratio.mediana.toFixed(1)}%
+                                  </span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span className="text-gray-600">P95 (pesimista):</span>
+                                  <span className="font-mono">{stats.deuda_pib_ratio.percentil_95.toFixed(1)}%</span>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="bg-white p-4 rounded-lg border-2 border-green-200">
+                              <p className="text-sm text-green-700 font-medium mb-2">RIN (millones USD)</p>
+                              <div className="space-y-1 text-xs">
+                                <div className="flex justify-between">
+                                  <span className="text-gray-600">P5 (pesimista):</span>
+                                  <span className="font-mono">${stats.rin.percentil_5.toFixed(0)}M</span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span className="text-gray-600">P50 (mediana):</span>
+                                  <span className="font-mono font-bold">${stats.rin.mediana.toFixed(0)}M</span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span className="text-gray-600">P95 (optimista):</span>
+                                  <span className="font-mono">${stats.rin.percentil_95.toFixed(0)}M</span>
+                                </div>
+                              </div>
+                            </div>
+                          </>
+                        )
+                      })()}
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-4">
+                      Mostrando estadísticas para Año {resultados[anoVisualizacion].ano}. La simulación representativa
+                      mostrada es la mediana de las {resultadosMonteCarlo.num_simulaciones.toLocaleString()}{" "}
+                      iteraciones.
+                    </p>
+                  </Card>
+                )}
+
                 <Card className="border-2 gradient-bolivia sticky top-0 z-10 shadow-lg">
                   <CardContent className="pt-6">
                     <div className="space-y-4">

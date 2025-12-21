@@ -257,3 +257,49 @@ class ResultadoSimulacion(BaseModel):
     
     resultados: List[ResultadoAnual]
     pasos: List[PasoSimulacion]
+
+class EstadisticasVariable(BaseModel):
+    """Estadísticas de una variable en Monte Carlo"""
+    promedio: float
+    mediana: float
+    desviacion_estandar: float
+    percentil_5: float
+    percentil_25: float
+    percentil_75: float
+    percentil_95: float
+    minimo: float
+    maximo: float
+
+class ResultadoMonteCarloAnual(BaseModel):
+    """Resultado anual con estadísticas de Monte Carlo"""
+    ano: int
+    
+    # Estadísticas de variables principales
+    ingresos_totales: EstadisticasVariable
+    gastos_totales: EstadisticasVariable
+    deficit_superavit: EstadisticasVariable
+    deuda_total: EstadisticasVariable
+    deuda_pib_ratio: EstadisticasVariable
+    rin: EstadisticasVariable
+    rin_meses_importacion: EstadisticasVariable
+    deficit_pib_ratio: EstadisticasVariable
+    presion_tributaria: EstadisticasVariable
+    
+    # Variables específicas
+    ing_gas: EstadisticasVariable
+    ing_mineria_total: EstadisticasVariable
+    ing_iva: EstadisticasVariable
+    ing_iue: EstadisticasVariable
+    gasto_subsidio_combustibles: EstadisticasVariable
+    
+    # Distribuciones completas (para histogramas)
+    distribucion_deficit: List[float]
+    distribucion_deuda_pib: List[float]
+    distribucion_rin: List[float]
+
+class ResultadoMonteCarloComplete(BaseModel):
+    """Resultado completo de simulación Monte Carlo"""
+    num_simulaciones: int
+    resultados_estadisticos: List[ResultadoMonteCarloAnual]
+    simulacion_representativa: List[ResultadoAnual]
+    metodo: str

@@ -1,6 +1,7 @@
 import type {
   ParametrosSimulacion as ParametrosSimulacionType,
   ResultadoSimulacion as ResultadoSimulacionType,
+  ResultadoMonteCarloComplete,
 } from "./types"
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
@@ -104,6 +105,31 @@ export async function simularFiscal(parametros: ParametrosSimulacionType): Promi
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({ detail: "Error desconocido" }))
     throw new Error(errorData.detail || "Error en la simulación")
+  }
+
+  return response.json()
+}
+
+/**
+ * Ejecuta una simulación Monte Carlo con múltiples iteraciones
+ */
+export async function simularMonteCarlo(
+  parametros: ParametrosSimulacionType,
+  numSimulaciones = 1000,
+): Promise<ResultadoMonteCarloComplete> {
+  console.log("[v0] Llamando a API Monte Carlo:", `${API_BASE_URL}/api/simular-monte-carlo`)
+
+  const response = await fetch(`${API_BASE_URL}/api/simular-monte-carlo?num_simulaciones=${numSimulaciones}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(parametros),
+  })
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({ detail: "Error desconocido" }))
+    throw new Error(errorData.detail || "Error en la simulación Monte Carlo")
   }
 
   return response.json()
