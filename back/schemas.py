@@ -221,6 +221,14 @@ class ResultadoAnual(BaseModel):
     deuda_interna: float
     deuda_pib_ratio: float
     
+    delta_deuda_externa: float = 0
+    delta_deuda_interna: float = 0
+    deuda_externa_pib: float = 0
+    deuda_interna_pib: float = 0
+    ratio_externa_total: float = 0
+    ratio_interna_total: float = 0
+    intereses_ingresos_ratio: float = 0
+    
     # Sector externo
     exportaciones: float
     importaciones: float

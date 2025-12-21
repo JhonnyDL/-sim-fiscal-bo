@@ -16,11 +16,12 @@ import {
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
+  Table2,
+  Zap,
 } from "lucide-react"
-import TablaResultados from "@/components/tabla-resultados"
 import GraficosInteractivos from "@/components/graficos-interactivos"
 import DiagramaRelaciones from "@/components/diagrama-relaciones"
-import GraficasDetalladas from "@/components/graficas-detalladas"
+import TablaCompletaUnificada from "@/components/tabla-completa-unificada"
 import {
   type ResultadoAnual,
   type PasoSimulacion,
@@ -41,6 +42,7 @@ const VERDE_BOLIVIA = "#007A3D"
 export default function Page() {
   const [mostrarLanding, setMostrarLanding] = useState(true)
   const [activeTab, setActiveTab] = useState<string>("parametrizacion")
+  const [dashboardSubTab, setDashboardSubTab] = useState<string>("graficos")
   const [parametros, setParametros] = useState<ParametrosModelo | null>(null)
   const [parametrosDefault, setParametrosDefault] = useState<ParametrosModelo | null>(null)
   const [cargandoParametros, setCargandoParametros] = useState(true)
@@ -54,18 +56,18 @@ export default function Page() {
   const [metodoSimulacion, setMetodoSimulacion] = useState<"box-muller" | "monte-carlo">("box-muller")
   const [numSimulacionesMC, setNumSimulacionesMC] = useState(1000)
   const [resultadosMonteCarlo, setResultadosMonteCarlo] = useState<ResultadoMonteCarloComplete | null>(null)
+  const [cargando, setCargando] = useState(false)
 
   useEffect(() => {
     const cargarParametrosDefault = async () => {
       try {
         console.log("[v0] Cargando parámetros por defecto desde el backend...")
         const parametrosBackend = await obtenerParametrosDefault()
-        console.log("[v0] Parámetros cargados:", parametrosBackend)
+        console.log("[v0] Parámetros cargados exitosamente:", parametrosBackend)
         setParametrosDefault(parametrosBackend)
         setParametros(parametrosBackend)
       } catch (error) {
-        console.error("[v0] Error al cargar parámetros del backend:", error)
-        alert("Error al cargar los parámetros por defecto. Verifica que el backend esté funcionando.")
+        console.error("[v0] Error al cargar parámetros:", error)
       } finally {
         setCargandoParametros(false)
       }
@@ -74,19 +76,30 @@ export default function Page() {
     cargarParametrosDefault()
   }, [])
 
-  const aplicarEscenario = (escenario: string) => {
+  const aplicarEscenario = async (escenario: string) => {
     if (!parametros) return
     console.log("[v0] Aplicando escenario:", escenario)
-    setParametros({ ...parametros, ...ESCENARIOS_SHOCKS[escenario as keyof typeof ESCENARIOS_SHOCKS].shocks })
+
+    const escenarioData = ESCENARIOS_SHOCKS[escenario as keyof typeof ESCENARIOS_SHOCKS]
+    const nuevosParametros = { ...parametros, ...escenarioData.shocks }
+
+    setParametros(nuevosParametros)
     setEscenarioSeleccionado(escenario)
+
+    setCargando(true)
+    try {
+      const resultado = await ejecutarSimulacion(nuevosParametros)
+      setResultados(resultado.resultados)
+      setPasos(resultado.pasos)
+      setAnoVisualizacion(resultado.resultados.length - 1)
+    } catch (error) {
+      console.error("[v0] Error al ejecutar simulación después de aplicar escenario:", error)
+    } finally {
+      setCargando(false)
+    }
   }
 
-  const ejecutarSimulacion = async () => {
-    if (!parametros) {
-      alert("Los parámetros aún no se han cargado. Espera un momento e intenta nuevamente.")
-      return
-    }
-
+  const ejecutarSimulacion = async (parametros: ParametrosModelo) => {
     setSimulando(true)
     setAnoVisualizacion(0)
     setResultadosMonteCarlo(null)
@@ -94,15 +107,12 @@ export default function Page() {
     try {
       if (metodoSimulacion === "box-muller") {
         const resultado = await simularFiscal(parametros)
-        setResultados(resultado.resultados)
-        setPasos(resultado.pasos)
+        return resultado
       } else {
         const resultadoMC = await simularMonteCarlo(parametros, numSimulacionesMC)
         setResultadosMonteCarlo(resultadoMC)
-        setResultados(resultadoMC.simulacion_representativa)
-        setPasos([]) // Monte Carlo no genera pasos detallados
+        return { resultados: resultadoMC.simulacion_representativa, pasos: [] }
       }
-      setActiveTab("dashboard")
     } catch (error) {
       console.error("Error en simulación:", error)
       alert("Error al ejecutar la simulación. Verifica que el backend esté funcionando.")
@@ -234,11 +244,11 @@ export default function Page() {
                     Resetear
                   </Button>
                   <Button
-                    onClick={ejecutarSimulacion}
-                    disabled={simulando}
+                    onClick={() => ejecutarSimulacion(parametros)}
+                    disabled={simulando || cargando}
                     className="shadow-md hover:shadow-lg transition-all bg-gradient-to-r from-primary to-[var(--bolivia-verde)]"
                   >
-                    {simulando ? (
+                    {simulando || cargando ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                         Simulando...
@@ -364,23 +374,56 @@ export default function Page() {
             </Card>
 
             <Card className="p-6 shadow-lg border-2">
-              <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-                <div className="h-1 w-8 gradient-bolivia rounded-full" />
+              <h3 className="text-sm font-semibold text-muted-foreground mb-3 flex items-center gap-2">
+                <Zap className="h-4 w-4" />
                 Escenarios Predefinidos
+                {escenarioSeleccionado && (
+                  <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-md">
+                    Activo: {ESCENARIOS_SHOCKS[escenarioSeleccionado as keyof typeof ESCENARIOS_SHOCKS].nombre}
+                  </span>
+                )}
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
                 {Object.entries(ESCENARIOS_SHOCKS).map(([key, escenario]) => (
                   <Button
                     key={key}
                     variant="outline"
+                    disabled={cargando}
                     className={`h-auto py-4 flex flex-col items-start text-left transition-all hover:scale-105 ${escenarioSeleccionado === key
-                      ? "bg-gradient-to-br from-primary to-[var(--bolivia-verde)] shadow-lg"
+                      ? "bg-gradient-to-br from-primary to-[var(--bolivia-verde)] text-primary-foreground shadow-lg border-primary"
                       : "hover:border-primary"
                       }`}
                     onClick={() => aplicarEscenario(key)}
                   >
                     <span className="font-semibold text-sm">{escenario.nombre}</span>
-                    <span className="text-xs text-muted-foreground mt-1 line-clamp-2">{escenario.descripcion}</span>
+                    <span
+                      className={`text-xs mt-1 line-clamp-2 ${escenarioSeleccionado === key ? "text-primary-foreground/80" : "text-muted-foreground"
+                        }`}
+                    >
+                      {escenario.descripcion}
+                    </span>
+                    <div className="mt-2 pt-2 border-t border-border/50 w-full">
+                      <div className="flex flex-wrap gap-1">
+                        {Object.entries(escenario.shocks).map(([k, v]) => {
+                          if (v !== 0) {
+                            const label = k.replace("shock_precio_", "").replace("shock_", "").toUpperCase()
+                            return (
+                              <span
+                                key={k}
+                                className={`text-[10px] px-1.5 py-0.5 rounded ${v > 0
+                                  ? "bg-green-500/20 text-green-700 dark:text-green-300"
+                                  : "bg-red-500/20 text-red-700 dark:text-red-300"
+                                  }`}
+                              >
+                                {label}: {v > 0 ? "+" : ""}
+                                {v}%
+                              </span>
+                            )
+                          }
+                          return null
+                        })}
+                      </div>
+                    </div>
                   </Button>
                 ))}
               </div>
@@ -476,7 +519,6 @@ export default function Page() {
                     </p>
                   </Card>
                 )}
-
                 <Card className="border-2 gradient-bolivia sticky top-0 z-10 shadow-lg">
                   <CardContent className="pt-6">
                     <div className="space-y-4">
@@ -495,48 +537,10 @@ export default function Page() {
                         </div>
                         <div className="flex gap-2">
                           <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setVelocidadAutoPlay(1000)}
-                            className={velocidadAutoPlay === 1000 ? "bg-yellow-100" : ""}
-                          >
-                            Rápido (1s)
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setVelocidadAutoPlay(2000)}
-                            className={velocidadAutoPlay === 2000 ? "bg-yellow-100" : ""}
-                          >
-                            Normal (2s)
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setVelocidadAutoPlay(3000)}
-                            className={velocidadAutoPlay === 3000 ? "bg-yellow-100" : ""}
-                          >
-                            Lento (3s)
-                          </Button>
-                        </div>
-                      </div>
-
-                      {/* Progress bar */}
-                      <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
-                        <div
-                          className="h-full transition-all duration-500 ease-out gradient-bolivia"
-                          style={{ width: `${((anoVisualizacion + 1) / resultados.length) * 100}%` }}
-                        />
-                      </div>
-
-                      {/* Controls */}
-                      <div className="flex items-center justify-between gap-4">
-                        <div className="flex gap-2">
-                          <Button
                             onClick={() => irAlAno(0)}
                             disabled={anoVisualizacion === 0}
                             variant="outline"
-                            size="icon"
+                            size="sm"
                             title="Ir al inicio"
                           >
                             <ChevronsLeft className="h-5 w-5" />
@@ -545,7 +549,7 @@ export default function Page() {
                             onClick={retrocederAno}
                             disabled={anoVisualizacion === 0}
                             variant="outline"
-                            size="icon"
+                            size="sm"
                             title="Año anterior"
                           >
                             <ChevronLeft className="h-5 w-5" />
@@ -572,7 +576,7 @@ export default function Page() {
                             onClick={avanzarAno}
                             disabled={anoVisualizacion === resultados.length - 1}
                             variant="outline"
-                            size="icon"
+                            size="sm"
                             title="Año siguiente"
                           >
                             <ChevronRight className="h-5 w-5" />
@@ -581,28 +585,20 @@ export default function Page() {
                             onClick={() => irAlAno(resultados.length - 1)}
                             disabled={anoVisualizacion === resultados.length - 1}
                             variant="outline"
-                            size="icon"
+                            size="sm"
                             title="Ir al final"
                           >
                             <ChevronsRight className="h-5 w-5" />
                           </Button>
                         </div>
+                      </div>
 
-                        {/* Year selector dropdown */}
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium">Saltar a:</span>
-                          <select
-                            value={anoVisualizacion}
-                            onChange={(e) => irAlAno(Number(e.target.value))}
-                            className="border rounded px-3 py-2 bg-white"
-                          >
-                            {resultados.map((r, idx) => (
-                              <option key={r.ano} value={idx}>
-                                Año {r.ano}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
+                      {/* Progress bar */}
+                      <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                        <div
+                          className="h-full transition-all duration-500 ease-out gradient-bolivia"
+                          style={{ width: `${((anoVisualizacion + 1) / resultados.length) * 100}%` }}
+                        />
                       </div>
 
                       {/* Key metrics for current year */}
@@ -649,16 +645,36 @@ export default function Page() {
                   </CardContent>
                 </Card>
 
+                <Card className="border-2 shadow-lg">
+                  <CardContent className="pt-6">
+                    <Tabs value={dashboardSubTab} onValueChange={setDashboardSubTab}>
+                      <TabsList className="grid w-full grid-cols-2 mb-6">
+                        <TabsTrigger value="graficos" className="flex items-center gap-2">
+                          <BarChart3 className="h-4 w-4" />
+                          Gráficos
+                        </TabsTrigger>
+                        <TabsTrigger value="tablas" className="flex items-center gap-2">
+                          <Table2 className="h-4 w-4" />
+                          Tablas
+                        </TabsTrigger>
+                      </TabsList>
+
+                      <TabsContent value="graficos" className="space-y-6">
+                        <GraficosInteractivos resultados={resultados} anoActual={anoVisualizacion} />
+                      </TabsContent>
+
+                      <TabsContent value="tablas" className="space-y-6">
+                        <TablaCompletaUnificada resultados={resultados} anoActual={anoVisualizacion} />
+                      </TabsContent>
+                    </Tabs>
+                  </CardContent>
+                </Card>
+
+
                 <DiagramaRelaciones
                   resultado={resultados[anoVisualizacion]}
                   resultadoAnterior={anoVisualizacion > 0 ? resultados[anoVisualizacion - 1] : undefined}
                 />
-
-                <GraficasDetalladas resultados={resultados} anoSeleccionado={anoVisualizacion} />
-
-                <GraficosInteractivos resultados={resultados} />
-
-                <TablaResultados resultados={resultados} />
               </>
             )}
           </TabsContent>

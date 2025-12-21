@@ -1,6 +1,6 @@
 "use client"
 
-import { Line, Bar, Doughnut, Chart } from "react-chartjs-2"
+import { Line, Bar, Doughnut } from "react-chartjs-2"
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -99,7 +99,7 @@ export default function GraficosInteractivos({ resultados, anoActual = resultado
     ],
   }
 
-  // Gráfico 3: Composición de Ingresos (último año)
+  // Gráfico 3: Composición de Ingresos (último año visible)
   const ultimoResultado = resultadosHastaAhora[resultadosHastaAhora.length - 1]
   const dataIngresos = {
     labels: ["Gas", "Minerales", "IVA", "IUE", "Otros Impuestos"],
@@ -207,8 +207,7 @@ export default function GraficosInteractivos({ resultados, anoActual = resultado
           </CardDescription>
         </CardHeader>
         <CardContent className="pt-6">
-          <Chart
-            type="bar"
+          <Bar
             data={dataDeuda}
             options={{
               ...optionsComunes,

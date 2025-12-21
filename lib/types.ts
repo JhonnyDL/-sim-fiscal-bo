@@ -26,9 +26,13 @@ export interface ParametrosSimulacion {
   shock_precio_estano: number
   shock_precio_plomo: number
 
-  subsidio_combustibles_activo?: boolean
+  inflacion?: number
+  tipo_cambio?: number
+  importaciones_base?: number
 
-  // Parámetros legacy (no usados por el backend pero necesarios para UI)
+  // Commodities
+  precio_gas?: number
+  volumen_gas?: number
   precio_zinc?: number
   volumen_zinc?: number
   precio_estano?: number
@@ -39,8 +43,8 @@ export interface ParametrosSimulacion {
   volumen_plata?: number
   precio_litio?: number
   volumen_litio?: number
-  precio_gas?: number
-  volumen_gas?: number
+
+  // Impuestos
   iva?: number
   iva_activo?: boolean
   iue?: number
@@ -55,10 +59,15 @@ export interface ParametrosSimulacion {
   ice_activo?: boolean
   ga?: number
   ga_activo?: boolean
+
+  // Gastos
   sueldos_salarios?: number
   bienes_servicios?: number
   inversion_publica?: number
+
+  // Subsidios
   subsidio_combustibles?: number
+  subsidio_combustibles_activo?: boolean
   subsidio_alimentos?: number
   subsidio_alimentos_activo?: boolean
 }
@@ -109,6 +118,14 @@ export interface ResultadoAnual {
   deuda_externa: number
   deuda_interna: number
   deuda_pib_ratio: number
+
+  delta_deuda_externa?: number
+  delta_deuda_interna?: number
+  deuda_externa_pib?: number
+  deuda_interna_pib?: number
+  ratio_externa_total?: number
+  ratio_interna_total?: number
+  intereses_ingresos_ratio?: number
 
   // Sector externo
   exportaciones: number
@@ -174,7 +191,51 @@ export const PARAMETROS_DEFAULT: ParametrosSimulacion = {
   shock_precio_estano: 0.0,
   shock_precio_plomo: 0.0,
 
+  // Commodities - Tipo Cambio
+  precio_gas: 4.2,
+  volumen_gas: 2800,
+  precio_zinc: 2850,
+  volumen_zinc: 480,
+  precio_estano: 26000,
+  volumen_estano: 19,
+  precio_oro: 1950,
+  volumen_oro: 38,
+  precio_plata: 25,
+  volumen_plata: 1300,
+  precio_litio: 19000,
+  volumen_litio: 28,
+
+  // Impuestos
+  iva: 8900,
+  iva_activo: true,
+  iue: 2950,
+  iue_activo: true,
+  it: 1700,
+  it_activo: true,
+  itf: 480,
+  itf_activo: true,
+  rc_iva: 3400,
+  rc_iva_activo: true,
+  ice: 920,
+  ice_activo: true,
+  ga: 1280,
+  ga_activo: true,
+
+  // Gastos
+  sueldos_salarios: 14200,
+  bienes_servicios: 8900,
+  inversion_publica: 6200,
+
+  // Combustibles y subsidios
+  subsidio_combustibles: 3100,
   subsidio_combustibles_activo: true,
+  subsidio_alimentos: 1050,
+  subsidio_alimentos_activo: true,
+
+  // Otros parámetros
+  inflacion: 1.5,
+  tipo_cambio: 6.96,
+  importaciones_base: 10200,
 }
 
 // Escenarios predefinidos de shocks

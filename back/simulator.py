@@ -36,6 +36,14 @@ class SimuladorFiscalBolivia:
         deuda_interna_anterior = estado_anterior.deuda_interna if estado_anterior else self.parametros.deuda_interna_inicial
         rin_anterior = estado_anterior.rin if estado_anterior else self.parametros.rin_inicial
         
+        # PASO 4: Calcular PIB (simplificado)
+        pib_anterior = estado_anterior.pib if estado_anterior else self.parametros.pib_inicial
+        pib = pib_anterior * (1 + self.parametros.crecimiento_pib / 100)
+        
+        # PASO 4: Calcular PIB (simplificado)
+        pib_anterior = estado_anterior.pib if estado_anterior else self.parametros.pib_inicial
+        pib = pib_anterior * (1 + self.parametros.crecimiento_pib / 100)
+        
         deficit_deuda = calcular_deficit_deuda(
             ingresos['total'],
             gastos['total'],
@@ -45,12 +53,9 @@ class SimuladorFiscalBolivia:
             self.parametros.tasa_interes_interna / 100,
             ingresos['gas_ingresos_brutos'] + ingresos['exportaciones_total'],
             rin_anterior,
-            ingresos['tipo_cambio']
+            ingresos['tipo_cambio'],
+            pib  # Agregado PIB
         )
-        
-        # PASO 4: Calcular PIB (simplificado)
-        pib_anterior = estado_anterior.pib if estado_anterior else self.parametros.pib_inicial
-        pib = pib_anterior * (1 + self.parametros.crecimiento_pib / 100)
         
         # PASO 5: Calcular indicadores
         deuda_pib = (deficit_deuda['deuda_total'] / pib * 100) if pib > 0 else 0
@@ -116,6 +121,13 @@ class SimuladorFiscalBolivia:
             deuda_externa=deficit_deuda['deuda_externa'],
             deuda_interna=deficit_deuda['deuda_interna'],
             deuda_pib_ratio=deuda_pib,
+            delta_deuda_externa=deficit_deuda.get('delta_deuda_externa', 0),
+            delta_deuda_interna=deficit_deuda.get('delta_deuda_interna', 0),
+            deuda_externa_pib=deficit_deuda.get('deuda_externa_pib', 0),
+            deuda_interna_pib=deficit_deuda.get('deuda_interna_pib', 0),
+            ratio_externa_total=deficit_deuda.get('ratio_externa_total', 0),
+            ratio_interna_total=deficit_deuda.get('ratio_interna_total', 0),
+            intereses_ingresos_ratio=deficit_deuda.get('intereses_ingresos_ratio', 0),
             # Externos (simplificados)
             exportaciones=ingresos['gas_ingresos_brutos'] + ingresos['exportaciones_total'],
             importaciones=importaciones_estimadas,
@@ -202,6 +214,14 @@ class SimuladorFiscalBolivia:
                 'ing_iva': [],
                 'ing_iue': [],
                 'gasto_subsidio_combustibles': [],
+                # Nuevos campos agregados
+                'delta_deuda_externa': [],
+                'delta_deuda_interna': [],
+                'deuda_externa_pib': [],
+                'deuda_interna_pib': [],
+                'ratio_externa_total': [],
+                'ratio_interna_total': [],
+                'intereses_ingresos_ratio': [],
             }
             
             for sim in todas_las_simulaciones:
@@ -245,7 +265,15 @@ class SimuladorFiscalBolivia:
                 # Distribuciones completas para histogramas
                 distribucion_deficit=valores['deficit_superavit'],
                 distribucion_deuda_pib=valores['deuda_pib_ratio'],
-                distribucion_rin=valores['rin']
+                distribucion_rin=valores['rin'],
+                # Nuevos campos agregados
+                distribucion_delta_deuda_externa=valores['delta_deuda_externa'],
+                distribucion_delta_deuda_interna=valores['delta_deuda_interna'],
+                distribucion_deuda_externa_pib=valores['deuda_externa_pib'],
+                distribucion_deuda_interna_pib=valores['deuda_interna_pib'],
+                distribucion_ratio_externa_total=valores['ratio_externa_total'],
+                distribucion_ratio_interna_total=valores['ratio_interna_total'],
+                distribucion_intereses_ingresos_ratio=valores['intereses_ingresos_ratio'],
             )
             
             resultados_mc.append(resultado_mc_ano)

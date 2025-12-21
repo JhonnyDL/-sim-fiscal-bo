@@ -299,7 +299,8 @@ def calcular_deficit_deuda(
     tasa_interes_interna: float,
     exportaciones: float,
     rin_anterior: float,
-    tc: float
+    tc: float,
+    pib: float  # Agregado PIB para calcular ratios desagregados
 ) -> Dict[str, float]:
     """
     Calcula déficit y actualiza deuda según el modelo
@@ -327,6 +328,17 @@ def calcular_deficit_deuda(
     deuda_interna = deuda_interna_anterior * (1 + tasa_interes_interna) - deficit_financiado_interno
     deuda_total = deuda_externa + deuda_interna
     
+    delta_deuda_externa = deuda_externa - deuda_externa_anterior
+    delta_deuda_interna = deuda_interna - deuda_interna_anterior
+    
+    deuda_externa_pib = (deuda_externa / pib) * 100 if pib > 0 else 0
+    deuda_interna_pib = (deuda_interna / pib) * 100 if pib > 0 else 0
+    
+    ratio_externa_total = (deuda_externa / deuda_total) * 100 if deuda_total > 0 else 0
+    ratio_interna_total = (deuda_interna / deuda_total) * 100 if deuda_total > 0 else 0
+    
+    intereses_ingresos_ratio = (intereses_totales / ingresos_totales) * 100 if ingresos_totales > 0 else 0
+    
     # RIN aumenta con exportaciones y disminuye si hay déficit externo
     exportaciones_usd = exportaciones / tc
     ajuste_rin = exportaciones_usd * 0.3  # 30% de exportaciones se acumula en RIN
@@ -344,8 +356,16 @@ def calcular_deficit_deuda(
         'intereses_externa': intereses_externa,
         'intereses_interna': intereses_interna,
         'intereses': intereses_totales,
-        'rin': rin
+        'rin': rin,
+        'delta_deuda_externa': delta_deuda_externa,
+        'delta_deuda_interna': delta_deuda_interna,
+        'deuda_externa_pib': deuda_externa_pib,
+        'deuda_interna_pib': deuda_interna_pib,
+        'ratio_externa_total': ratio_externa_total,
+        'ratio_interna_total': ratio_interna_total,
+        'intereses_ingresos_ratio': intereses_ingresos_ratio,
     }
+
 def calcular_indicadores(parametros, estado_anterior=None):
     """
     Calcula los indicadores fiscales clave usando ingresos y gastos.
@@ -362,7 +382,8 @@ def calcular_indicadores(parametros, estado_anterior=None):
         tasa_interes_interna=parametros.tasa_interes_interna,
         exportaciones=ingresos['exportaciones_total'],
         rin_anterior=estado_anterior.rin if estado_anterior else 0,
-        tc=ingresos['tipo_cambio']
+        tc=ingresos['tipo_cambio'],
+        pib=parametros.pib  # Agregado PIB para calcular ratios desagregados
     )
     
     return {
