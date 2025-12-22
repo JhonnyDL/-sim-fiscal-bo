@@ -26,13 +26,103 @@ export interface ParametrosSimulacion {
   shock_precio_estano: number
   shock_precio_plomo: number
 
-  inflacion?: number
-  tipo_cambio?: number
-  importaciones_base?: number
+  subsidio_combustibles_activo?: boolean
 
-  // Commodities
-  precio_gas?: number
-  volumen_gas?: number
+  // Tipo de Cambio (RF3)
+  tc_base: number
+  tc_coef_z: number
+
+  // Gas Natural (RF4)
+  gas_volumen_base: number
+  gas_volumen_coef_z: number
+  gas_precio_base: number
+  gas_precio_coef_z: number
+  gas_tasa_idh: number
+  gas_tasa_regalias: number
+
+  // Oro (RF4)
+  oro_volumen_base: number
+  oro_volumen_coef_z: number
+  oro_precio_base: number
+  oro_precio_coef_z: number
+  oro_tasa_regalias: number
+
+  // Plata (RF4)
+  plata_volumen_base: number
+  plata_volumen_coef_z: number
+  plata_precio_base: number
+  plata_precio_coef_z: number
+  plata_tasa_regalias: number
+
+  // Zinc (RF4)
+  zinc_volumen_base: number
+  zinc_volumen_coef_z: number
+  zinc_precio_base: number
+  zinc_precio_coef_z: number
+  zinc_tasa_regalias: number
+
+  // Estaño (RF4)
+  estano_volumen_base: number
+  estano_volumen_coef_z: number
+  estano_precio_base: number
+  estano_precio_coef_z: number
+  estano_tasa_regalias: number
+
+  // Plomo (RF4)
+  plomo_volumen_base: number
+  plomo_volumen_coef_z: number
+  plomo_precio_base: number
+  plomo_precio_coef_z: number
+  plomo_tasa_regalias: number
+
+  // Impuestos (RF5)
+  iva_mi_base: number
+  iva_mi_coef_z: number
+  iue_base: number
+  iue_coef_z: number
+  it_base: number
+  it_coef_z: number
+  ice_mi_base: number
+  ice_mi_coef_z: number
+  rc_iva_base: number
+  rc_iva_coef_z: number
+  itf_base: number
+  itf_coef_z: number
+  ij_base: number
+  ij_coef_z: number
+  cv_base: number
+  cv_coef_z: number
+  ga_base: number
+  ga_coef_z: number
+  iva_i_base: number
+  iva_i_coef_z: number
+  ice_i_base: number
+  ice_i_coef_z: number
+  iehd_mi_base: number
+  iehd_mi_coef_z: number
+  iehd_i_base: number
+  iehd_i_coef_z: number
+
+  // Gastos (RF6)
+  gasto_corriente_base: number
+  gasto_corriente_coef_z: number
+  subsidio_alimentos_base: number
+  subsidio_alimentos_coef_z: number
+
+  // Subsidio Combustibles (RF7)
+  gasolina_precio_importacion_base: number
+  gasolina_precio_importacion_coef_z: number
+  gasolina_volumen_importacion_base: number
+  gasolina_volumen_importacion_coef_z: number
+  gasolina_precio_venta_domestico: number
+
+  diesel_precio_importacion_base: number
+  diesel_precio_importacion_coef_z: number
+  diesel_volumen_importacion_base: number
+  diesel_volumen_importacion_coef_z: number
+  diesel_precio_venta_domestico: number
+
+  // Parámetros legacy (no usados por el backend pero necesarios para UI)
   precio_zinc?: number
   volumen_zinc?: number
   precio_estano?: number
@@ -43,8 +133,8 @@ export interface ParametrosSimulacion {
   volumen_plata?: number
   precio_litio?: number
   volumen_litio?: number
-
-  // Impuestos
+  precio_gas?: number
+  volumen_gas?: number
   iva?: number
   iva_activo?: boolean
   iue?: number
@@ -59,17 +149,15 @@ export interface ParametrosSimulacion {
   ice_activo?: boolean
   ga?: number
   ga_activo?: boolean
-
-  // Gastos
   sueldos_salarios?: number
   bienes_servicios?: number
   inversion_publica?: number
-
-  // Subsidios
   subsidio_combustibles?: number
-  subsidio_combustibles_activo?: boolean
   subsidio_alimentos?: number
   subsidio_alimentos_activo?: boolean
+  inflacion?: number
+  tipo_cambio?: number
+  importaciones_base?: number
 }
 
 export interface ResultadoAnual {
@@ -161,137 +249,6 @@ export interface PasoSimulacion {
 export interface ResultadoSimulacion {
   resultados: ResultadoAnual[]
   pasos: PasoSimulacion[]
-}
-
-// Parámetros por defecto basados en datos actuales de Bolivia
-export const PARAMETROS_DEFAULT: ParametrosSimulacion = {
-  anos: 6,
-
-  // PIB y finanzas (datos 2024)
-  pib_inicial: 420000, // 420 mil millones de Bs
-  crecimiento_pib: 3.2, // 3.2% proyectado
-
-  deuda_externa_inicial: 100000, // 100 mil millones de Bs
-  deuda_interna_inicial: 50000, // 50 mil millones de Bs
-  tasa_interes_externa: 4.3, // 4.3% promedio deuda externa
-  tasa_interes_interna: 3.1, // 3.1% promedio deuda interna
-
-  rin_inicial: 3500, // 3500 millones USD
-
-  // Compatibilidad
-  deuda_inicial: 150000,
-  tasa_interes: 4.3,
-
-  // Shocks externos (0 = sin shock, valores en %)
-  shock_tc: 0.0,
-  shock_precio_gas: 0.0,
-  shock_precio_oro: 0.0,
-  shock_precio_plata: 0.0,
-  shock_precio_zinc: 0.0,
-  shock_precio_estano: 0.0,
-  shock_precio_plomo: 0.0,
-
-  // Commodities - Tipo Cambio
-  precio_gas: 4.2,
-  volumen_gas: 2800,
-  precio_zinc: 2850,
-  volumen_zinc: 480,
-  precio_estano: 26000,
-  volumen_estano: 19,
-  precio_oro: 1950,
-  volumen_oro: 38,
-  precio_plata: 25,
-  volumen_plata: 1300,
-  precio_litio: 19000,
-  volumen_litio: 28,
-
-  // Impuestos
-  iva: 8900,
-  iva_activo: true,
-  iue: 2950,
-  iue_activo: true,
-  it: 1700,
-  it_activo: true,
-  itf: 480,
-  itf_activo: true,
-  rc_iva: 3400,
-  rc_iva_activo: true,
-  ice: 920,
-  ice_activo: true,
-  ga: 1280,
-  ga_activo: true,
-
-  // Gastos
-  sueldos_salarios: 14200,
-  bienes_servicios: 8900,
-  inversion_publica: 6200,
-
-  // Combustibles y subsidios
-  subsidio_combustibles: 3100,
-  subsidio_combustibles_activo: true,
-  subsidio_alimentos: 1050,
-  subsidio_alimentos_activo: true,
-
-  // Otros parámetros
-  inflacion: 1.5,
-  tipo_cambio: 6.96,
-  importaciones_base: 10200,
-}
-
-// Escenarios predefinidos de shocks
-export const ESCENARIOS_SHOCKS = {
-  normal: {
-    nombre: "Escenario Normal",
-    descripcion: "Sin shocks externos",
-    shocks: {
-      shock_tc: 0,
-      shock_precio_gas: 0,
-      shock_precio_oro: 0,
-      shock_precio_plata: 0,
-      shock_precio_zinc: 0,
-      shock_precio_estano: 0,
-      shock_precio_plomo: 0,
-    },
-  },
-  crisis_commodities: {
-    nombre: "Crisis de Commodities",
-    descripcion: "Caída de precios internacionales",
-    shocks: {
-      shock_tc: 5,
-      shock_precio_gas: -30,
-      shock_precio_oro: -20,
-      shock_precio_plata: -25,
-      shock_precio_zinc: -30,
-      shock_precio_estano: -25,
-      shock_precio_plomo: -28,
-    },
-  },
-  auge_minerales: {
-    nombre: "Auge de Minerales",
-    descripcion: "Aumento de precios de minerales",
-    shocks: {
-      shock_tc: 0,
-      shock_precio_gas: 0,
-      shock_precio_oro: 25,
-      shock_precio_plata: 30,
-      shock_precio_zinc: 20,
-      shock_precio_estano: 22,
-      shock_precio_plomo: 18,
-    },
-  },
-  crisis_energetica: {
-    nombre: "Crisis Energética",
-    descripcion: "Aumento de precios de hidrocarburos",
-    shocks: {
-      shock_tc: 0,
-      shock_precio_gas: 40,
-      shock_precio_oro: 0,
-      shock_precio_plata: 0,
-      shock_precio_zinc: 0,
-      shock_precio_estano: 0,
-      shock_precio_plomo: 0,
-    },
-  },
 }
 
 export interface EstadisticasVariable {

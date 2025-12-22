@@ -2,7 +2,7 @@
 import LandingPage from "@/components/landing-page"
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   Play,
   Loader2,
@@ -18,16 +18,13 @@ import {
   ChevronsRight,
   Table2,
   Zap,
+  X,
 } from "lucide-react"
 import GraficosInteractivos from "@/components/graficos-interactivos"
 import DiagramaRelaciones from "@/components/diagrama-relaciones"
 import TablaCompletaUnificada from "@/components/tabla-completa-unificada"
-import {
-  type ResultadoAnual,
-  type PasoSimulacion,
-  ESCENARIOS_SHOCKS,
-  type ResultadoMonteCarloComplete,
-} from "@/lib/types"
+import type { ResultadoAnual, PasoSimulacion, ResultadoMonteCarloComplete } from "@/lib/types"
+import { ESCENARIOS_SHOCKS } from "@/lib/escenarios"
 import { simularFiscal, simularMonteCarlo, exportarExcel, exportarPDF, obtenerParametrosDefault } from "@/lib/api"
 import { EditorParametrosAvanzados, type ParametrosModelo } from "@/components/editor-parametros-avanzados"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -35,6 +32,7 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { toast } from "@/components/ui/use-toast"
 
 const ROJO_BOLIVIA = "#DA291C"
 const VERDE_BOLIVIA = "#007A3D"
@@ -58,21 +56,30 @@ export default function Page() {
   const [resultadosMonteCarlo, setResultadosMonteCarlo] = useState<ResultadoMonteCarloComplete | null>(null)
   const [cargando, setCargando] = useState(false)
 
-  useEffect(() => {
-    const cargarParametrosDefault = async () => {
-      try {
-        console.log("[v0] Cargando parámetros por defecto desde el backend...")
-        const parametrosBackend = await obtenerParametrosDefault()
-        console.log("[v0] Parámetros cargados exitosamente:", parametrosBackend)
-        setParametrosDefault(parametrosBackend)
-        setParametros(parametrosBackend)
-      } catch (error) {
-        console.error("[v0] Error al cargar parámetros:", error)
-      } finally {
-        setCargandoParametros(false)
-      }
-    }
+  const cargarParametrosDefault = async () => {
+    try {
+      console.log("[v0] Cargando parámetros por defecto desde el backend...")
+      const parametrosBackend = await obtenerParametrosDefault()
+      console.log("[v0] Parámetros cargados exitosamente:", parametrosBackend)
 
+      if (!parametrosBackend.tc_base) {
+        console.error("[v0] ERROR: El backend no devolvió todos los parámetros avanzados")
+        throw new Error("Parámetros incompletos del backend")
+      }
+
+      setParametrosDefault(parametrosBackend)
+      setParametros(parametrosBackend)
+    } catch (error) {
+      console.error("[v0] Error al cargar parámetros:", error)
+      alert(
+        "Error: No se pudo conectar con el backend. Por favor, asegúrate de que el servidor Python esté ejecutándose en http://localhost:8000",
+      )
+    } finally {
+      setCargandoParametros(false)
+    }
+  }
+
+  useEffect(() => {
     cargarParametrosDefault()
   }, [])
 
@@ -83,9 +90,11 @@ export default function Page() {
     const escenarioData = ESCENARIOS_SHOCKS[escenario as keyof typeof ESCENARIOS_SHOCKS]
     const nuevosParametros = { ...parametros, ...escenarioData.shocks }
 
+    // Actualizar parámetros inmediatamente para reflejar cambios en el editor
     setParametros(nuevosParametros)
     setEscenarioSeleccionado(escenario)
 
+    // Ejecutar simulación en segundo plano
     setCargando(true)
     try {
       const resultado = await ejecutarSimulacion(nuevosParametros)
@@ -93,7 +102,12 @@ export default function Page() {
       setPasos(resultado.pasos)
       setAnoVisualizacion(resultado.resultados.length - 1)
     } catch (error) {
-      console.error("[v0] Error al ejecutar simulación después de aplicar escenario:", error)
+      console.error("Error al ejecutar simulación:", error)
+      toast({
+        title: "Error",
+        description: "No se pudo ejecutar la simulación del escenario",
+        variant: "destructive",
+      })
     } finally {
       setCargando(false)
     }
@@ -373,60 +387,120 @@ export default function Page() {
               )}
             </Card>
 
-            <Card className="p-6 shadow-lg border-2">
-              <h3 className="text-sm font-semibold text-muted-foreground mb-3 flex items-center gap-2">
-                <Zap className="h-4 w-4" />
-                Escenarios Predefinidos
-                {escenarioSeleccionado && (
-                  <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-md">
-                    Activo: {ESCENARIOS_SHOCKS[escenarioSeleccionado as keyof typeof ESCENARIOS_SHOCKS].nombre}
-                  </span>
-                )}
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-                {Object.entries(ESCENARIOS_SHOCKS).map(([key, escenario]) => (
-                  <Button
-                    key={key}
-                    variant="outline"
-                    disabled={cargando}
-                    className={`h-auto py-4 flex flex-col items-start text-left transition-all hover:scale-105 ${escenarioSeleccionado === key
-                      ? "bg-gradient-to-br from-primary to-[var(--bolivia-verde)] text-primary-foreground shadow-lg border-primary"
-                      : "hover:border-primary"
-                      }`}
-                    onClick={() => aplicarEscenario(key)}
-                  >
-                    <span className="font-semibold text-sm">{escenario.nombre}</span>
-                    <span
-                      className={`text-xs mt-1 line-clamp-2 ${escenarioSeleccionado === key ? "text-primary-foreground/80" : "text-muted-foreground"
-                        }`}
-                    >
-                      {escenario.descripcion}
-                    </span>
-                    <div className="mt-2 pt-2 border-t border-border/50 w-full">
-                      <div className="flex flex-wrap gap-1">
-                        {Object.entries(escenario.shocks).map(([k, v]) => {
-                          if (v !== 0) {
-                            const label = k.replace("shock_precio_", "").replace("shock_", "").toUpperCase()
-                            return (
-                              <span
-                                key={k}
-                                className={`text-[10px] px-1.5 py-0.5 rounded ${v > 0
-                                  ? "bg-green-500/20 text-green-700 dark:text-green-300"
-                                  : "bg-red-500/20 text-red-700 dark:text-red-300"
-                                  }`}
-                              >
-                                {label}: {v > 0 ? "+" : ""}
-                                {v}%
-                              </span>
-                            )
-                          }
-                          return null
-                        })}
-                      </div>
+            {/* Escenarios Predefinidos */}
+            <Card className="shadow-md border-2">
+              <div className="h-2 gradient-bolivia" />
+              <CardHeader className="bg-gradient-to-br from-card to-muted/20">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-primary/10 rounded-lg">
+                      <Zap className="h-5 w-5 text-primary" />
                     </div>
-                  </Button>
-                ))}
-              </div>
+                    <div>
+                      <CardTitle className="text-xl font-bold">Escenarios Predefinidos</CardTitle>
+                      {escenarioSeleccionado && (
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Activo:{" "}
+                          <span className="font-semibold text-primary">
+                            {ESCENARIOS_SHOCKS[escenarioSeleccionado as keyof typeof ESCENARIOS_SHOCKS].nombre}
+                          </span>
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  {escenarioSeleccionado && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setEscenarioSeleccionado(null)
+                        cargarParametrosDefault()
+                      }}
+                      className="text-xs"
+                    >
+                      <X className="h-4 w-4 mr-1" />
+                      Limpiar
+                    </Button>
+                  )}
+                </div>
+              </CardHeader>
+              <CardContent className="p-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {Object.entries(ESCENARIOS_SHOCKS).map(([key, escenario]) => {
+                    const isActive = escenarioSeleccionado === key
+                    const shockEntries = Object.entries(escenario.shocks).filter(([_, v]) => v !== 0)
+
+                    return (
+                      <button
+                        key={key}
+                        disabled={cargando}
+                        className={`
+                          relative overflow-hidden rounded-xl p-5 text-left transition-all duration-300
+                          border-2 hover:scale-[1.02] active:scale-[0.98]
+                          disabled:opacity-50 disabled:cursor-not-allowed
+                          ${isActive
+                            ? "bg-gradient-to-br from-primary via-primary/90 to-[var(--bolivia-verde)] text-primary-foreground shadow-xl border-primary/50 scale-[1.02]"
+                            : "bg-card hover:bg-muted/50 border-border hover:border-primary/30 shadow-sm"
+                          }
+                        `}
+                        onClick={() => aplicarEscenario(key)}
+                      >
+                        {/* Indicador de activo */}
+                        {isActive && (
+                          <div className="absolute top-3 right-3">
+                            <div className="w-3 h-3 bg-white rounded-full animate-pulse shadow-lg" />
+                          </div>
+                        )}
+
+                        {/* Nombre del escenario */}
+                        <h4 className={`font-bold text-base mb-2 pr-6 ${isActive ? "text-white" : "text-foreground"}`}>
+                          {escenario.nombre}
+                        </h4>
+
+                        {/* Descripción */}
+                        <p
+                          className={`text-xs mb-3 line-clamp-2 leading-relaxed ${isActive ? "text-white/90" : "text-muted-foreground"
+                            }`}
+                        >
+                          {escenario.descripcion}
+                        </p>
+
+                        {/* Shocks aplicados */}
+                        {shockEntries.length > 0 && (
+                          <div className={`pt-3 border-t ${isActive ? "border-white/20" : "border-border"}`}>
+                            <div className="flex flex-wrap gap-1.5">
+                              {shockEntries.map(([k, v]) => {
+                                const label = k.replace("shock_precio_", "").replace("shock_", "").toUpperCase()
+                                const isPositive = v > 0
+
+                                return (
+                                  <span
+                                    key={k}
+                                    className={`
+                                      inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-1 rounded-md
+                                      ${isActive
+                                        ? isPositive
+                                          ? "bg-white/20 text-white"
+                                          : "bg-white/20 text-white"
+                                        : isPositive
+                                          ? "bg-green-500/15 text-green-700 dark:bg-green-500/20 dark:text-green-300"
+                                          : "bg-red-500/15 text-red-700 dark:bg-red-500/20 dark:text-red-300"
+                                      }
+                                    `}
+                                  >
+                                    {isPositive ? "↑" : "↓"} {label}: {isPositive ? "+" : ""}
+                                    {v}%
+                                  </span>
+                                )
+                              })}
+                            </div>
+                          </div>
+                        )}
+                      </button>
+                    )
+                  })}
+                </div>
+              </CardContent>
             </Card>
 
             <EditorParametrosAvanzados
@@ -519,6 +593,8 @@ export default function Page() {
                     </p>
                   </Card>
                 )}
+
+
                 <Card className="border-2 gradient-bolivia sticky top-0 z-10 shadow-lg">
                   <CardContent className="pt-6">
                     <div className="space-y-4">
@@ -644,7 +720,6 @@ export default function Page() {
                     </div>
                   </CardContent>
                 </Card>
-
                 <Card className="border-2 shadow-lg">
                   <CardContent className="pt-6">
                     <Tabs value={dashboardSubTab} onValueChange={setDashboardSubTab}>
@@ -669,6 +744,7 @@ export default function Page() {
                     </Tabs>
                   </CardContent>
                 </Card>
+
 
 
                 <DiagramaRelaciones
