@@ -54,7 +54,7 @@ export default function DiagramaRelaciones({ resultado, resultadoAnterior }: Pro
                 <div className="pl-4 space-y-1 text-sm">
                   <div className="flex justify-between">
                     <span>Ingresos Gas:</span>
-                    <span className="font-bold">${resultado.ing_gas.toFixed(0)}M</span>
+                    <span className="font-bold">Bs{resultado.ing_gas.toFixed(0)}</span>
                   </div>
                   <CambioIndicador actual={resultado.ing_gas} anterior={resultadoAnterior?.ing_gas} />
                 </div>
@@ -67,22 +67,22 @@ export default function DiagramaRelaciones({ resultado, resultadoAnterior }: Pro
               <div className="space-y-3">
                 <div className="font-semibold text-blue-800">Exportación de Minerales</div>
                 <div className="pl-4 space-y-1 text-sm">
-                  <div>Zinc: ${resultado.ing_zinc.toFixed(0)}M</div>
-                  <div>Estaño: ${resultado.ing_estano.toFixed(0)}M</div>
-                  <div>Oro: ${resultado.ing_oro.toFixed(0)}M</div>
-                  <div>Plata: ${resultado.ing_plata.toFixed(0)}M</div>
-                  <div>Litio: ${resultado.ing_litio.toFixed(0)}M</div>
+                  <div>Zinc: Bs{resultado.ing_zinc.toFixed(0)}</div>
+                  <div>Estaño: Bs{resultado.ing_estano.toFixed(0)}</div>
+                  <div>Oro: Bs{resultado.ing_oro.toFixed(0)}</div>
+                  <div>Plata: Bs{resultado.ing_plata.toFixed(0)}</div>
+                  {/* <div>Litio: Bs{resultado.ing_litio.toFixed(0)}</div> */}
                 </div>
                 <div className="flex items-center text-xs text-blue-600">
                   <ArrowRight className="h-4 w-4 mr-1" />
-                  Regalías mineras 5%
+                  Regalías mineras 12%
                 </div>
               </div>
 
               <div className="p-3 rounded bg-green-100 border-2 border-green-500">
                 <div className="font-bold text-green-900">INGRESOS POR EXPORTACIONES</div>
                 <div className="text-2xl font-bold text-green-700 mt-2">
-                  ${(resultado.ing_hidrocarburos_total + resultado.ing_mineria_total).toFixed(0)}M
+                  Bs{(resultado.ing_hidrocarburos_total + resultado.ing_mineria_total).toFixed(0)}
                 </div>
                 <CambioIndicador
                   actual={resultado.ing_hidrocarburos_total + resultado.ing_mineria_total}
@@ -104,7 +104,7 @@ export default function DiagramaRelaciones({ resultado, resultadoAnterior }: Pro
                 <div className="flex justify-between items-center">
                   <span>IVA:</span>
                   <span className="font-bold">
-                    ${resultado.ing_iva.toFixed(0)}M
+                    Bs{resultado.ing_iva.toFixed(0)}
                     {resultado.ing_iva === 0 && (
                       <Badge variant="destructive" className="ml-2 text-xs">
                         DESACTIVADO
@@ -115,7 +115,7 @@ export default function DiagramaRelaciones({ resultado, resultadoAnterior }: Pro
                 <div className="flex justify-between items-center">
                   <span>IUE:</span>
                   <span className="font-bold">
-                    ${resultado.ing_iue.toFixed(0)}M
+                    Bs{resultado.ing_iue.toFixed(0)}
                     {resultado.ing_iue === 0 && (
                       <Badge variant="destructive" className="ml-2 text-xs">
                         DESACTIVADO
@@ -126,7 +126,7 @@ export default function DiagramaRelaciones({ resultado, resultadoAnterior }: Pro
                 <div className="flex justify-between items-center">
                   <span>IT:</span>
                   <span className="font-bold">
-                    ${resultado.ing_it.toFixed(0)}M
+                    Bs{resultado.ing_it.toFixed(0)}
                     {resultado.ing_it === 0 && (
                       <Badge variant="destructive" className="ml-2 text-xs">
                         DESACTIVADO
@@ -137,7 +137,7 @@ export default function DiagramaRelaciones({ resultado, resultadoAnterior }: Pro
                 <div className="flex justify-between items-center">
                   <span>ITF:</span>
                   <span className="font-bold">
-                    ${resultado.ing_itf.toFixed(0)}M
+                    Bs{resultado.ing_itf.toFixed(0)}
                     {resultado.ing_itf === 0 && (
                       <Badge variant="destructive" className="ml-2 text-xs">
                         DESACTIVADO
@@ -149,7 +149,7 @@ export default function DiagramaRelaciones({ resultado, resultadoAnterior }: Pro
               <div className="p-3 rounded bg-yellow-100 border-2 border-yellow-500">
                 <div className="font-bold text-yellow-900">INGRESOS TRIBUTARIOS</div>
                 <div className="text-2xl font-bold text-yellow-700 mt-2">
-                  ${resultado.ing_impuestos_total.toFixed(0)}M
+                  Bs{resultado.ing_impuestos_total.toFixed(0)}
                 </div>
                 <CambioIndicador
                   actual={resultado.ing_impuestos_total}
@@ -168,7 +168,7 @@ export default function DiagramaRelaciones({ resultado, resultadoAnterior }: Pro
               <h3 className="font-bold text-lg text-green-900">3. Balance Fiscal</h3>
               <div className="text-right">
                 <div className="text-sm text-muted-foreground">INGRESOS TOTALES</div>
-                <div className="text-2xl font-bold text-green-700">${resultado.ingresos_totales.toFixed(0)}M</div>
+                <div className="text-2xl font-bold text-green-700">Bs{resultado.ingresos_totales.toFixed(0)}</div>
               </div>
             </div>
 
@@ -180,10 +180,10 @@ export default function DiagramaRelaciones({ resultado, resultadoAnterior }: Pro
               <div>
                 <div className="font-semibold text-green-800 mb-2">Gastos Corrientes</div>
                 <div className="pl-4 space-y-1 text-sm">
-                  <div>Sueldos: ${resultado.gasto_sueldos.toFixed(0)}M</div>
-                  <div>Bienes/Servicios: ${resultado.gasto_bienes_servicios.toFixed(0)}M</div>
+                  <div>Sueldos: Bs{resultado.gasto_sueldos.toFixed(0)}</div>
+                  <div>Bienes/Servicios: Bs{resultado.gasto_bienes_servicios.toFixed(0)}</div>
                   <div>
-                    Subsidio combustibles: ${resultado.gasto_subsidio_combustibles.toFixed(0)}M
+                    Subsidio combustibles: Bs{resultado.gasto_subsidio_combustibles.toFixed(0)}
                     {resultado.gasto_subsidio_combustibles === 0 && (
                       <Badge variant="outline" className="ml-2 text-xs">
                         OFF
@@ -191,7 +191,7 @@ export default function DiagramaRelaciones({ resultado, resultadoAnterior }: Pro
                     )}
                   </div>
                   <div>
-                    Subsidio alimentos: ${resultado.gasto_subsidio_alimentos.toFixed(0)}M
+                    Subsidio alimentos: Bs{resultado.gasto_subsidio_alimentos.toFixed(0)}
                     {resultado.gasto_subsidio_alimentos === 0 && (
                       <Badge variant="outline" className="ml-2 text-xs">
                         OFF
@@ -203,16 +203,16 @@ export default function DiagramaRelaciones({ resultado, resultadoAnterior }: Pro
               <div>
                 <div className="font-semibold text-green-800 mb-2">Gastos de Capital e Intereses</div>
                 <div className="pl-4 space-y-1 text-sm">
-                  <div>Inversión pública: ${resultado.gasto_inversion.toFixed(0)}M</div>
-                  <div>Intereses deuda externa: ${resultado.intereses_deuda_externa.toFixed(0)}M</div>
-                  <div>Intereses deuda interna: ${resultado.intereses_deuda_interna.toFixed(0)}M</div>
+                  <div>Inversión pública: Bs{resultado.gasto_inversion.toFixed(0)}</div>
+                  <div>Intereses deuda externa: Bs{resultado.intereses_deuda_externa.toFixed(0)}</div>
+                  <div>Intereses deuda interna: Bs{resultado.intereses_deuda_interna.toFixed(0)}</div>
                 </div>
               </div>
             </div>
 
             <div className="text-right">
               <div className="text-sm text-muted-foreground">GASTOS TOTALES</div>
-              <div className="text-2xl font-bold text-red-600">${resultado.gastos_totales.toFixed(0)}M</div>
+              <div className="text-2xl font-bold text-red-600">Bs{resultado.gastos_totales.toFixed(0)}</div>
             </div>
           </div>
 
@@ -225,7 +225,7 @@ export default function DiagramaRelaciones({ resultado, resultadoAnterior }: Pro
               <div className="p-4 rounded bg-red-100 border-2 border-red-400">
                 <div className="font-bold text-red-900">DÉFICIT FISCAL</div>
                 <div className="text-2xl font-bold text-red-700 mt-2">
-                  {resultado.deficit_superavit > 0 ? "-" : "+"}${Math.abs(resultado.deficit_superavit).toFixed(0)}M
+                  {resultado.deficit_superavit > 0 ? "-" : "+"}Bs{Math.abs(resultado.deficit_superavit).toFixed(0)}
                 </div>
                 <div className="text-xs mt-1 text-red-600">{resultado.deficit_pib_ratio.toFixed(1)}% del PIB</div>
               </div>
@@ -241,7 +241,7 @@ export default function DiagramaRelaciones({ resultado, resultadoAnterior }: Pro
 
               <div className="p-4 rounded bg-orange-100 border-2 border-orange-500">
                 <div className="font-bold text-orange-900">DEUDA PÚBLICA</div>
-                <div className="text-2xl font-bold text-orange-700 mt-2">${resultado.deuda_total.toFixed(0)}M</div>
+                <div className="text-2xl font-bold text-orange-700 mt-2">Bs{resultado.deuda_total.toFixed(0)}</div>
                 <CambioIndicador actual={resultado.deuda_total} anterior={resultadoAnterior?.deuda_total} />
                 <div className="text-xs mt-1 text-orange-600">
                   Ratio Deuda/PIB: {resultado.deuda_pib_ratio.toFixed(1)}%
@@ -265,10 +265,10 @@ export default function DiagramaRelaciones({ resultado, resultadoAnterior }: Pro
                 <div
                   className={`text-2xl font-bold mt-2 ${resultado.saldo_comercial > 0 ? "text-green-700" : "text-red-700"}`}
                 >
-                  {resultado.saldo_comercial > 0 ? "+" : ""}${resultado.saldo_comercial.toFixed(0)}M
+                  {resultado.saldo_comercial > 0 ? "+" : ""}Bs{resultado.saldo_comercial.toFixed(0)}
                 </div>
                 <div className="text-xs mt-1 text-blue-600">
-                  Exp: ${resultado.exportaciones.toFixed(0)}M - Imp: ${resultado.importaciones.toFixed(0)}M
+                  Exp: Bs{resultado.exportaciones.toFixed(0)} - Imp: Bs{resultado.importaciones.toFixed(0)}
                 </div>
               </div>
 
@@ -283,7 +283,7 @@ export default function DiagramaRelaciones({ resultado, resultadoAnterior }: Pro
 
               <div className="p-4 rounded bg-cyan-100 border-2 border-cyan-500">
                 <div className="font-bold text-cyan-900">RESERVAS (RIN)</div>
-                <div className="text-2xl font-bold text-cyan-700 mt-2">${resultado.rin.toFixed(0)}M</div>
+                <div className="text-2xl font-bold text-cyan-700 mt-2">Bs{resultado.rin.toFixed(0)}</div>
                 <CambioIndicador actual={resultado.rin} anterior={resultadoAnterior?.rin} />
                 <div className="text-xs mt-1 text-cyan-600">
                   Cubre {resultado.rin_meses_importacion.toFixed(1)} meses de importaciones

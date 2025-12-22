@@ -383,7 +383,7 @@ export function EditorParametrosAvanzados({
 
               <div className="space-y-2">
                 <Label htmlFor="pib_inicial" className="font-semibold">
-                  PIB Inicial (MM USD)
+                  PIB Inicial (Bs)
                 </Label>
                 <Input
                   id="pib_inicial"
@@ -410,7 +410,7 @@ export function EditorParametrosAvanzados({
 
               <div className="space-y-2">
                 <Label htmlFor="deuda_externa_inicial" className="font-semibold">
-                  Deuda Externa Inicial (MM USD)
+                  Deuda Externa Inicial (Bs)
                 </Label>
                 <Input
                   id="deuda_externa_inicial"
@@ -423,7 +423,7 @@ export function EditorParametrosAvanzados({
 
               <div className="space-y-2">
                 <Label htmlFor="deuda_interna_inicial" className="font-semibold">
-                  Deuda Interna Inicial (MM USD)
+                  Deuda Interna Inicial (Bs)
                 </Label>
                 <Input
                   id="deuda_interna_inicial"
@@ -436,7 +436,7 @@ export function EditorParametrosAvanzados({
 
               <div className="space-y-2">
                 <Label htmlFor="rin_inicial" className="font-semibold">
-                  RIN Inicial (MM USD)
+                  RIN Inicial (Bs)
                 </Label>
                 <Input
                   id="rin_inicial"
@@ -599,7 +599,7 @@ export function EditorParametrosAvanzados({
             </div>
             <div className="bg-muted/50 p-4 rounded-lg">
               <p className="text-sm text-muted-foreground mb-2">
-                Fórmula: <code className="bg-background px-2 py-1 rounded">TC = Base + Coef_Z × Z</code>
+                Fórmula: <code className="bg-background px-2 py-1 rounded">TC = Base + Desviacion × Z</code>
               </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -618,7 +618,7 @@ export function EditorParametrosAvanzados({
               </div>
               <div className="space-y-2">
                 <Label htmlFor="tc_coef_z" className="font-semibold">
-                  Coeficiente Z
+                  Desviacion
                 </Label>
                 <Input
                   id="tc_coef_z"
@@ -662,7 +662,7 @@ export function EditorParametrosAvanzados({
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-xs font-semibold">Volumen Coef_Z</Label>
+                  <Label className="text-xs font-semibold">Desviacion Volumen</Label>
                   <Input
                     type="number"
                     step="1000"
@@ -682,7 +682,7 @@ export function EditorParametrosAvanzados({
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-xs font-semibold">Precio Coef_Z</Label>
+                  <Label className="text-xs font-semibold">Desviacion Precio</Label>
                   <Input
                     type="number"
                     step="0.01"
@@ -805,7 +805,7 @@ export function EditorParametrosAvanzados({
             <div className="bg-muted/50 p-4 rounded-lg">
               <p className="text-sm text-muted-foreground">
                 Todos los impuestos siguen:{" "}
-                <code className="bg-background px-2 py-1 rounded">I = Base + Coef_Z × Z</code>
+                <code className="bg-background px-2 py-1 rounded">I = Base + Desviacion × Z</code>
               </p>
             </div>
             <div className="grid gap-3">
@@ -930,7 +930,7 @@ export function EditorParametrosAvanzados({
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-xs font-semibold">Coeficiente Z</Label>
+                    <Label className="text-xs font-semibold">Desviacion</Label>
                     <Input
                       type="number"
                       step="1000000"
@@ -956,7 +956,7 @@ export function EditorParametrosAvanzados({
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-xs font-semibold">Coeficiente Z</Label>
+                    <Label className="text-xs font-semibold">Desviacion</Label>
                     <Input
                       type="number"
                       step="1000000"
@@ -1034,7 +1034,7 @@ export function EditorParametrosAvanzados({
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-xs font-semibold">Precio Import Coef_Z</Label>
+                    <Label className="text-xs font-semibold">Desviacion Precio Import</Label>
                     <Input
                       type="number"
                       step="0.01"
@@ -1058,7 +1058,7 @@ export function EditorParametrosAvanzados({
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-xs font-semibold">Volumen Import Coef_Z</Label>
+                    <Label className="text-xs font-semibold">Desviacion Volumen Import </Label>
                     <Input
                       type="number"
                       step="1000"
@@ -1100,7 +1100,7 @@ export function EditorParametrosAvanzados({
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-xs font-semibold">Precio Import Coef_Z</Label>
+                    <Label className="text-xs font-semibold">Desviacion Precio Import</Label>
                     <Input
                       type="number"
                       step="0.01"
@@ -1124,7 +1124,7 @@ export function EditorParametrosAvanzados({
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-xs font-semibold">Volumen Import Coef_Z</Label>
+                    <Label className="text-xs font-semibold">Desviacion Volumen Import</Label>
                     <Input
                       type="number"
                       step="1000"
@@ -1198,7 +1198,7 @@ function RecursoMineralEditor({
           />
         </div>
         <div className="space-y-2">
-          <Label className="text-xs font-semibold">Volumen Coef_Z</Label>
+          <Label className="text-xs font-semibold">Desviacion Volumen</Label>
           <Input
             type="number"
             step="0.01"
@@ -1218,7 +1218,7 @@ function RecursoMineralEditor({
           />
         </div>
         <div className="space-y-2">
-          <Label className="text-xs font-semibold">Precio Coef_Z</Label>
+          <Label className="text-xs font-semibold">Desviacion Precio</Label>
           <Input
             type="number"
             step="0.01"

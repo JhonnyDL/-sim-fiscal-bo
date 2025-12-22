@@ -46,7 +46,7 @@ export default function GraficasDetalladas({ resultados, anoSeleccionado }: Prop
     { nombre: "Estaño", valor: resultadoActual.ing_estano, color: "#F1FAEE" },
     { nombre: "Oro", valor: resultadoActual.ing_oro, color: "#FFD700" },
     { nombre: "Plata", valor: resultadoActual.ing_plata, color: "#C0C0C0" },
-    { nombre: "Litio", valor: resultadoActual.ing_litio, color: "#A8DADC" },
+    // { nombre: "Litio", valor: resultadoActual.ing_litio, color: "#A8DADC" },
   ]
 
   // Datos para composición de impuestos
@@ -123,7 +123,7 @@ export default function GraficasDetalladas({ resultados, anoSeleccionado }: Prop
                       cx="50%"
                       cy="50%"
                       labelLine={false}
-                      label={({ nombre, valor }) => `${nombre}: $${valor.toFixed(0)}M`}
+                      label={({ nombre, valor }) => `${nombre}: Bs${valor.toFixed(0)}`}
                       outerRadius={80}
                       fill="#8884d8"
                       dataKey="valor"
@@ -132,7 +132,7 @@ export default function GraficasDetalladas({ resultados, anoSeleccionado }: Prop
                         <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}
                     </Pie>
-                    <Tooltip formatter={(value: number) => `$${value.toFixed(2)}M`} />
+                    <Tooltip formatter={(value: number) => `Bs${value.toFixed(2)}`} />
                   </PieChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -150,7 +150,7 @@ export default function GraficasDetalladas({ resultados, anoSeleccionado }: Prop
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="nombre" />
                     <YAxis />
-                    <Tooltip formatter={(value: number) => `$${value.toFixed(2)}M`} />
+                    <Tooltip formatter={(value: number) => `Bs${value.toFixed(2)}`} />
                     <Bar dataKey="valor" fill={COLORES.impuestos} />
                   </BarChart>
                 </ResponsiveContainer>
@@ -171,7 +171,7 @@ export default function GraficasDetalladas({ resultados, anoSeleccionado }: Prop
                       cx="50%"
                       cy="50%"
                       labelLine={false}
-                      label={({ nombre, valor }) => `${nombre}: $${valor.toFixed(0)}M`}
+                      label={({ nombre, valor }) => `${nombre}: Bs${valor.toFixed(0)}`}
                       outerRadius={80}
                       fill="#8884d8"
                       dataKey="valor"
@@ -180,7 +180,7 @@ export default function GraficasDetalladas({ resultados, anoSeleccionado }: Prop
                         <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}
                     </Pie>
-                    <Tooltip formatter={(value: number) => `$${value.toFixed(2)}M`} />
+                    <Tooltip formatter={(value: number) => `Bs${value.toFixed(2)}`} />
                   </PieChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -198,7 +198,7 @@ export default function GraficasDetalladas({ resultados, anoSeleccionado }: Prop
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="ano" />
                     <YAxis />
-                    <Tooltip formatter={(value: number) => `$${value.toFixed(2)}M`} />
+                    <Tooltip formatter={(value: number) => `Bs${value.toFixed(2)}`} />
                     <Legend />
                     <Area
                       type="monotone"
@@ -234,7 +234,7 @@ export default function GraficasDetalladas({ resultados, anoSeleccionado }: Prop
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="ano" />
                     <YAxis />
-                    <Tooltip formatter={(value: number) => `$${value.toFixed(2)}M`} />
+                    <Tooltip formatter={(value: number) => `Bs${value.toFixed(2)}`} />
                     <Legend />
                     <Area
                       type="monotone"
@@ -298,7 +298,7 @@ export default function GraficasDetalladas({ resultados, anoSeleccionado }: Prop
                     <XAxis dataKey="ano" />
                     <YAxis yAxisId="left" />
                     <YAxis yAxisId="right" orientation="right" />
-                    <Tooltip formatter={(value: number) => `$${value.toFixed(2)}M`} />
+                    <Tooltip formatter={(value: number) => `Bs${value.toFixed(2)}`} />
                     <Legend />
                     <Bar yAxisId="left" dataKey="deuda" fill={COLORES.deuda} name="Deuda Total" />
                     <Line

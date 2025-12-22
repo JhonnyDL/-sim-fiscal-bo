@@ -211,7 +211,7 @@ export default function Page() {
                       Simulador Fiscal de Bolivia
                     </h1>
                     <p className="text-muted-foreground text-sm mt-1">
-                      Modelo estocástico DSGE • Proyección fiscal 2020-2025
+                      Modelo estocástico DSGE • Proyección fiscal
                     </p>
                   </div>
                 </div>
@@ -456,17 +456,17 @@ export default function Page() {
                               <div className="space-y-1 text-xs">
                                 <div className="flex justify-between">
                                   <span className="text-gray-600">P5 (optimista):</span>
-                                  <span className="font-mono">${stats.deficit_superavit.percentil_5.toFixed(0)}M</span>
+                                  <span className="font-mono">Bs{stats.deficit_superavit.percentil_5.toFixed(0)}</span>
                                 </div>
                                 <div className="flex justify-between">
                                   <span className="text-gray-600">P50 (mediana):</span>
                                   <span className="font-mono font-bold">
-                                    ${stats.deficit_superavit.mediana.toFixed(0)}M
+                                    Bs{stats.deficit_superavit.mediana.toFixed(0)}
                                   </span>
                                 </div>
                                 <div className="flex justify-between">
                                   <span className="text-gray-600">P95 (pesimista):</span>
-                                  <span className="font-mono">${stats.deficit_superavit.percentil_95.toFixed(0)}M</span>
+                                  <span className="font-mono">Bs{stats.deficit_superavit.percentil_95.toFixed(0)}</span>
                                 </div>
                               </div>
                             </div>
@@ -496,15 +496,15 @@ export default function Page() {
                               <div className="space-y-1 text-xs">
                                 <div className="flex justify-between">
                                   <span className="text-gray-600">P5 (pesimista):</span>
-                                  <span className="font-mono">${stats.rin.percentil_5.toFixed(0)}M</span>
+                                  <span className="font-mono">Bs{stats.rin.percentil_5.toFixed(0)}</span>
                                 </div>
                                 <div className="flex justify-between">
                                   <span className="text-gray-600">P50 (mediana):</span>
-                                  <span className="font-mono font-bold">${stats.rin.mediana.toFixed(0)}M</span>
+                                  <span className="font-mono font-bold">Bs{stats.rin.mediana.toFixed(0)}</span>
                                 </div>
                                 <div className="flex justify-between">
                                   <span className="text-gray-600">P95 (optimista):</span>
-                                  <span className="font-mono">${stats.rin.percentil_95.toFixed(0)}M</span>
+                                  <span className="font-mono">Bs{stats.rin.percentil_95.toFixed(0)}</span>
                                 </div>
                               </div>
                             </div>
@@ -606,13 +606,13 @@ export default function Page() {
                         <div className="bg-green-50 p-3 rounded-lg border border-green-200">
                           <p className="text-xs text-green-700 font-medium">Ingresos</p>
                           <p className="text-lg font-bold text-green-900">
-                            ${resultados[anoVisualizacion].ingresos_totales.toFixed(0)}M
+                            Bs{resultados[anoVisualizacion].ingresos_totales.toFixed(0)}
                           </p>
                         </div>
                         <div className="bg-red-50 p-3 rounded-lg border border-red-200">
                           <p className="text-xs text-red-700 font-medium">Gastos</p>
                           <p className="text-lg font-bold text-red-900">
-                            ${resultados[anoVisualizacion].gastos_totales.toFixed(0)}M
+                            Bs{resultados[anoVisualizacion].gastos_totales.toFixed(0)}
                           </p>
                         </div>
                         <div
@@ -631,13 +631,13 @@ export default function Page() {
                             className={`text-lg font-bold ${resultados[anoVisualizacion].deficit_superavit > 0 ? "text-red-900" : "text-green-900"
                               }`}
                           >
-                            ${Math.abs(resultados[anoVisualizacion].deficit_superavit).toFixed(0)}M
+                            Bs{Math.abs(resultados[anoVisualizacion].deficit_superavit).toFixed(0)}
                           </p>
                         </div>
                         <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
                           <p className="text-xs text-blue-700 font-medium">RIN</p>
                           <p className="text-lg font-bold text-blue-900">
-                            ${resultados[anoVisualizacion].rin.toFixed(0)}M
+                            Bs{resultados[anoVisualizacion].rin.toFixed(0)}
                           </p>
                         </div>
                       </div>

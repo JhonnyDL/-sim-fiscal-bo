@@ -87,10 +87,10 @@ export default function TablaResultados({ resultados, anoActual }: Props) {
                 <TableRow key={resultado.ano} className={idx % 2 === 0 ? "bg-gray-50" : ""}>
                   <TableCell className="font-medium">{resultado.ano}</TableCell>
                   <TableCell className="text-right text-green-600 font-semibold">
-                    ${resultado.ingresos_totales.toFixed(0)}M
+                    Bs{resultado.ingresos_totales.toFixed(0)}
                   </TableCell>
                   <TableCell className="text-right text-red-600 font-semibold">
-                    ${resultado.gastos_totales.toFixed(0)}M
+                    Bs{resultado.gastos_totales.toFixed(0)}
                   </TableCell>
                   <TableCell className="text-right">
                     <span
@@ -98,10 +98,10 @@ export default function TablaResultados({ resultados, anoActual }: Props) {
                         resultado.deficit_superavit > 0 ? "text-red-600 font-bold" : "text-green-600 font-bold"
                       }
                     >
-                      {resultado.deficit_superavit > 0 ? "-" : "+"}${Math.abs(resultado.deficit_superavit).toFixed(0)}M
+                      {resultado.deficit_superavit > 0 ? "-" : "+"}Bs{Math.abs(resultado.deficit_superavit).toFixed(0)}
                     </span>
                   </TableCell>
-                  <TableCell className="text-right">${resultado.deuda_total.toFixed(0)}M</TableCell>
+                  <TableCell className="text-right">Bs{resultado.deuda_total.toFixed(0)}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-2">
                       {resultado.deuda_pib_ratio.toFixed(1)}%
@@ -114,7 +114,7 @@ export default function TablaResultados({ resultados, anoActual }: Props) {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-2">
-                      ${resultado.rin.toFixed(0)}M
+                      Bs{resultado.rin.toFixed(0)}
                       {resultado.rin_meses_importacion < 3 && (
                         <Badge variant="destructive" className="text-xs">
                           BAJO
@@ -122,10 +122,10 @@ export default function TablaResultados({ resultados, anoActual }: Props) {
                       )}
                     </div>
                   </TableCell>
-                  <TableCell className="text-right">${resultado.pib.toFixed(0)}M</TableCell>
+                  <TableCell className="text-right">Bs{resultado.pib.toFixed(0)}</TableCell>
                   <TableCell className="text-right">
                     <span className={resultado.saldo_comercial > 0 ? "text-green-600" : "text-red-600"}>
-                      {resultado.saldo_comercial > 0 ? "+" : ""}${resultado.saldo_comercial.toFixed(0)}M
+                      {resultado.saldo_comercial > 0 ? "+" : ""}Bs{resultado.saldo_comercial.toFixed(0)}
                     </span>
                   </TableCell>
                 </TableRow>
@@ -150,7 +150,7 @@ export default function TablaResultados({ resultados, anoActual }: Props) {
                   <TableHead className="text-right">Estaño</TableHead>
                   <TableHead className="text-right">Oro</TableHead>
                   <TableHead className="text-right">Plata</TableHead>
-                  <TableHead className="text-right">Litio</TableHead>
+                  {/* <TableHead className="text-right">Litio</TableHead> */}
                   <TableHead className="text-right">IVA</TableHead>
                   <TableHead className="text-right">IUE</TableHead>
                   <TableHead className="text-right">Otros</TableHead>
@@ -160,16 +160,16 @@ export default function TablaResultados({ resultados, anoActual }: Props) {
                 {resultadosMostrar.map((r, idx) => (
                   <TableRow key={r.ano} className={idx % 2 === 0 ? "bg-gray-50" : ""}>
                     <TableCell>{r.ano}</TableCell>
-                    <TableCell className="text-right">${r.ing_gas.toFixed(0)}M</TableCell>
-                    <TableCell className="text-right">${r.ing_zinc.toFixed(0)}M</TableCell>
-                    <TableCell className="text-right">${r.ing_estano.toFixed(0)}M</TableCell>
-                    <TableCell className="text-right">${r.ing_oro.toFixed(0)}M</TableCell>
-                    <TableCell className="text-right">${r.ing_plata.toFixed(0)}M</TableCell>
-                    <TableCell className="text-right">${r.ing_litio.toFixed(0)}M</TableCell>
-                    <TableCell className="text-right">${r.ing_iva.toFixed(0)}M</TableCell>
-                    <TableCell className="text-right">${r.ing_iue.toFixed(0)}M</TableCell>
+                    <TableCell className="text-right">Bs{r.ing_gas.toFixed(0)}</TableCell>
+                    <TableCell className="text-right">Bs{r.ing_zinc.toFixed(0)}</TableCell>
+                    <TableCell className="text-right">Bs{r.ing_estano.toFixed(0)}</TableCell>
+                    <TableCell className="text-right">Bs{r.ing_oro.toFixed(0)}</TableCell>
+                    <TableCell className="text-right">Bs{r.ing_plata.toFixed(0)}</TableCell>
+                    {/* <TableCell className="text-right">Bs{r.ing_litio.toFixed(0)}</TableCell> */}
+                    <TableCell className="text-right">Bs{r.ing_iva.toFixed(0)}</TableCell>
+                    <TableCell className="text-right">Bs{r.ing_iue.toFixed(0)}</TableCell>
                     <TableCell className="text-right">
-                      ${(r.ing_it + r.ing_itf + r.ing_rc_iva + r.ing_ice + r.ing_ga).toFixed(0)}M
+                      {(r.ing_it + r.ing_itf + r.ing_rc_iva + r.ing_ice + r.ing_ga).toFixed(0)}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -202,13 +202,13 @@ export default function TablaResultados({ resultados, anoActual }: Props) {
                 {resultadosMostrar.map((r, idx) => (
                   <TableRow key={r.ano} className={idx % 2 === 0 ? "bg-gray-50" : ""}>
                     <TableCell>{r.ano}</TableCell>
-                    <TableCell className="text-right">${r.gasto_sueldos.toFixed(0)}M</TableCell>
-                    <TableCell className="text-right">${r.gasto_bienes_servicios.toFixed(0)}M</TableCell>
-                    <TableCell className="text-right">${r.gasto_inversion.toFixed(0)}M</TableCell>
-                    <TableCell className="text-right">${r.gasto_subsidio_combustibles.toFixed(0)}M</TableCell>
-                    <TableCell className="text-right">${r.gasto_subsidio_alimentos.toFixed(0)}M</TableCell>
-                    <TableCell className="text-right">${r.intereses_totales.toFixed(0)}M</TableCell>
-                    <TableCell className="text-right font-bold">${r.gastos_totales.toFixed(0)}M</TableCell>
+                    <TableCell className="text-right">Bs{r.gasto_sueldos.toFixed(0)}</TableCell>
+                    <TableCell className="text-right">Bs{r.gasto_bienes_servicios.toFixed(0)}</TableCell>
+                    <TableCell className="text-right">Bs{r.gasto_inversion.toFixed(0)}</TableCell>
+                    <TableCell className="text-right">Bs{r.gasto_subsidio_combustibles.toFixed(0)}</TableCell>
+                    <TableCell className="text-right">Bs{r.gasto_subsidio_alimentos.toFixed(0)}</TableCell>
+                    <TableCell className="text-right">Bs{r.intereses_totales.toFixed(0)}</TableCell>
+                    <TableCell className="text-right font-bold">Bs{r.gastos_totales.toFixed(0)}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>

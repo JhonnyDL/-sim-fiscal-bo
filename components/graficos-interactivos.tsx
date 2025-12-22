@@ -80,7 +80,7 @@ export default function GraficosInteractivos({ resultados, anoActual = resultado
     labels: anosHastaAhora,
     datasets: [
       {
-        label: "Deuda Total (MM USD)",
+        label: "Deuda Total (Bs)",
         data: resultadosHastaAhora.map((r) => r.deuda_total),
         borderColor: "#DA291C",
         backgroundColor: "rgba(218, 41, 28, 0.8)",
@@ -128,7 +128,7 @@ export default function GraficosInteractivos({ resultados, anoActual = resultado
     labels: anosHastaAhora,
     datasets: [
       {
-        label: "RIN (MM USD)",
+        label: "RIN (Bs)",
         data: resultadosHastaAhora.map((r) => r.rin),
         borderColor: "#3B82F6",
         backgroundColor: "rgba(59, 130, 246, 0.1)",
@@ -174,7 +174,7 @@ export default function GraficosInteractivos({ resultados, anoActual = resultado
               label += ": "
             }
             if (context.parsed.y !== null) {
-              label += "$" + context.parsed.y.toFixed(0) + "M"
+              label += "Bs" + context.parsed.y.toFixed(0)
             }
             return label
           },
@@ -218,7 +218,7 @@ export default function GraficosInteractivos({ resultados, anoActual = resultado
                   position: "left" as const,
                   title: {
                     display: true,
-                    text: "Deuda (MM USD)",
+                    text: "Deuda (Bs)",
                   },
                 },
                 y1: {
@@ -265,7 +265,7 @@ export default function GraficosInteractivos({ resultados, anoActual = resultado
                           const value = context.parsed
                           const total = context.dataset.data.reduce((a: number, b: number) => a + b, 0)
                           const percentage = ((value / total) * 100).toFixed(1)
-                          return `${label}: $${value.toFixed(0)}M (${percentage}%)`
+                          return `${label}: Bs${value.toFixed(0)} (${percentage}%)`
                         },
                       },
                     },
@@ -296,7 +296,7 @@ export default function GraficosInteractivos({ resultados, anoActual = resultado
                     position: "left" as const,
                     title: {
                       display: true,
-                      text: "RIN (MM USD)",
+                      text: "RIN (Bs)",
                     },
                   },
                   y1: {
@@ -305,7 +305,7 @@ export default function GraficosInteractivos({ resultados, anoActual = resultado
                     position: "right" as const,
                     title: {
                       display: true,
-                      text: "Saldo Comercial (MM USD)",
+                      text: "Saldo Comercial (Bs)",
                     },
                     grid: {
                       drawOnChartArea: false,
