@@ -7,15 +7,15 @@ PARAMETROS_DEFAULT = {
     "crecimiento_pib": 3.2,  # %
     
     # Deuda y finanzas
-    "deuda_externa_inicial": 100000,  # millones de Bs
-    "deuda_interna_inicial": 50000,   # millones de Bs
+    "deuda_externa_inicial": 210811,  # millones de Bs
+    "deuda_interna_inicial": 95839,   # millones de Bs
     "tasa_interes_externa": 4.3,      # %
     "tasa_interes_interna": 3.1,      # %
     
     "rin_inicial": 3500,  # millones USD
     
     # Compatibilidad
-    "deuda_inicial": 150000,  # millones de Bs
+    "deuda_inicial": 306650,  # millones de Bs
     "tasa_interes": 4.3,      # %
     
     # Shocks (RF2 - Shocks Externos)

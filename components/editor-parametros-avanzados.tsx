@@ -413,7 +413,7 @@ export function EditorParametrosAvanzados({
 
               <div className="space-y-2">
                 <Label htmlFor="pib_inicial" className="font-semibold">
-                  PIB Inicial (MM USD)
+                  PIB Inicial (Bs)
                 </Label>
                 <Input
                   id="pib_inicial"
@@ -440,7 +440,7 @@ export function EditorParametrosAvanzados({
 
               <div className="space-y-2">
                 <Label htmlFor="deuda_externa_inicial" className="font-semibold">
-                  Deuda Externa Inicial (MM USD)
+                  Deuda Externa Inicial (MM Bs.)
                 </Label>
                 <Input
                   id="deuda_externa_inicial"
@@ -453,7 +453,7 @@ export function EditorParametrosAvanzados({
 
               <div className="space-y-2">
                 <Label htmlFor="deuda_interna_inicial" className="font-semibold">
-                  Deuda Interna Inicial (MM USD)
+                  Deuda Interna Inicial (MM Bs.)
                 </Label>
                 <Input
                   id="deuda_interna_inicial"
@@ -466,7 +466,7 @@ export function EditorParametrosAvanzados({
 
               <div className="space-y-2">
                 <Label htmlFor="rin_inicial" className="font-semibold">
-                  RIN Inicial (MM USD)
+                  RIN Inicial (MM Bs.)
                 </Label>
                 <Input
                   id="rin_inicial"

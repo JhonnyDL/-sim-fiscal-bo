@@ -123,7 +123,7 @@ export default function GraficasDetalladas({ resultados, anoSeleccionado }: Prop
                       cx="50%"
                       cy="50%"
                       labelLine={false}
-                      label={({ nombre, valor }) => `${nombre}: $${valor.toFixed(0)}M`}
+                      label={({ nombre, valor }) => `${nombre}: Bs.${valor.toFixed(0)}M`}
                       outerRadius={80}
                       fill="#8884d8"
                       dataKey="valor"
@@ -132,7 +132,7 @@ export default function GraficasDetalladas({ resultados, anoSeleccionado }: Prop
                         <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}
                     </Pie>
-                    <Tooltip formatter={(value: number) => `$${value.toFixed(2)}M`} />
+                    <Tooltip formatter={(value: number) => `Bs.${value.toFixed(2)}M`} />
                   </PieChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -150,7 +150,7 @@ export default function GraficasDetalladas({ resultados, anoSeleccionado }: Prop
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="nombre" />
                     <YAxis />
-                    <Tooltip formatter={(value: number) => `$${value.toFixed(2)}M`} />
+                    <Tooltip formatter={(value: number) => `Bs.${value.toFixed(2)}M`} />
                     <Bar dataKey="valor" fill={COLORES.impuestos} />
                   </BarChart>
                 </ResponsiveContainer>
@@ -171,7 +171,7 @@ export default function GraficasDetalladas({ resultados, anoSeleccionado }: Prop
                       cx="50%"
                       cy="50%"
                       labelLine={false}
-                      label={({ nombre, valor }) => `${nombre}: $${valor.toFixed(0)}M`}
+                      label={({ nombre, valor }) => `${nombre}: Bs.${valor.toFixed(0)}M`}
                       outerRadius={80}
                       fill="#8884d8"
                       dataKey="valor"
@@ -180,7 +180,7 @@ export default function GraficasDetalladas({ resultados, anoSeleccionado }: Prop
                         <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}
                     </Pie>
-                    <Tooltip formatter={(value: number) => `$${value.toFixed(2)}M`} />
+                    <Tooltip formatter={(value: number) => `Bs.${value.toFixed(2)}M`} />
                   </PieChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -198,7 +198,7 @@ export default function GraficasDetalladas({ resultados, anoSeleccionado }: Prop
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="ano" />
                     <YAxis />
-                    <Tooltip formatter={(value: number) => `$${value.toFixed(2)}M`} />
+                    <Tooltip formatter={(value: number) => `Bs.${value.toFixed(2)}M`} />
                     <Legend />
                     <Area
                       type="monotone"
@@ -234,7 +234,7 @@ export default function GraficasDetalladas({ resultados, anoSeleccionado }: Prop
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="ano" />
                     <YAxis />
-                    <Tooltip formatter={(value: number) => `$${value.toFixed(2)}M`} />
+                    <Tooltip formatter={(value: number) => `Bs.${value.toFixed(2)}M`} />
                     <Legend />
                     <Area
                       type="monotone"

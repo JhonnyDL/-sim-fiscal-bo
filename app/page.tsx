@@ -11,14 +11,11 @@ import {
   BarChart3,
   Download,
   Calendar,
-  Pause,
-  ChevronLeft,
-  ChevronRight,
-  ChevronsLeft,
-  ChevronsRight,
   Table2,
   Zap,
   X,
+  ExternalLink,
+  Activity,
 } from "lucide-react"
 import GraficosInteractivos from "@/components/graficos-interactivos"
 import DiagramaRelaciones from "@/components/diagrama-relaciones"
@@ -30,9 +27,9 @@ import { EditorParametrosAvanzados, type ParametrosModelo } from "@/components/e
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { toast } from "@/components/ui/use-toast"
+import { ControlSimulacionFlotante } from "@/components/control-simulacion-flotante"
 
 const ROJO_BOLIVIA = "#DA291C"
 const VERDE_BOLIVIA = "#007A3D"
@@ -50,8 +47,8 @@ export default function Page() {
   const [anoVisualizacion, setAnoVisualizacion] = useState(0)
   const [autoPlay, setAutoPlay] = useState(false)
   const [velocidadAutoPlay, setVelocidadAutoPlay] = useState(2000) // milliseconds
-  const [escenarioSeleccionado, setEscenarioSeleccionado] = useState<string | null>(null)
-  const [metodoSimulacion, setMetodoSimulacion] = useState<"box-muller" | "monte-carlo">("box-muller")
+  const [escenarioSeleccionado, setEscenarioSeleccionado] = useState<string | null>("normal") // Establecer "normal" como escenario por defecto
+  const [metodoSimulacion, setMetodoSimulacion] = useState<"box-muller" | "monte-carlo">("monte-carlo")
   const [numSimulacionesMC, setNumSimulacionesMC] = useState(1000)
   const [resultadosMonteCarlo, setResultadosMonteCarlo] = useState<ResultadoMonteCarloComplete | null>(null)
   const [cargando, setCargando] = useState(false)
@@ -83,34 +80,21 @@ export default function Page() {
     cargarParametrosDefault()
   }, [])
 
-  const aplicarEscenario = async (escenario: string) => {
+  const aplicarEscenario = (escenario: string) => {
     if (!parametros) return
     console.log("[v0] Aplicando escenario:", escenario)
 
     const escenarioData = ESCENARIOS_SHOCKS[escenario as keyof typeof ESCENARIOS_SHOCKS]
     const nuevosParametros = { ...parametros, ...escenarioData.shocks }
 
-    // Actualizar parámetros inmediatamente para reflejar cambios en el editor
+    // Solo actualizar parámetros, no ejecutar simulación automáticamente
     setParametros(nuevosParametros)
     setEscenarioSeleccionado(escenario)
 
-    // Ejecutar simulación en segundo plano
-    setCargando(true)
-    try {
-      const resultado = await ejecutarSimulacion(nuevosParametros)
-      setResultados(resultado.resultados)
-      setPasos(resultado.pasos)
-      setAnoVisualizacion(resultado.resultados.length - 1)
-    } catch (error) {
-      console.error("Error al ejecutar simulación:", error)
-      toast({
-        title: "Error",
-        description: "No se pudo ejecutar la simulación del escenario",
-        variant: "destructive",
-      })
-    } finally {
-      setCargando(false)
-    }
+    toast({
+      title: "Escenario aplicado",
+      description: `Se ha aplicado el escenario: ${escenarioData.nombre}. Presiona "Simular" para ver los resultados.`,
+    })
   }
 
   const ejecutarSimulacion = async (parametros: ParametrosModelo) => {
@@ -142,7 +126,7 @@ export default function Page() {
       setPasos([])
       setAnoVisualizacion(0)
       setAutoPlay(false)
-      setEscenarioSeleccionado(null)
+      setEscenarioSeleccionado("normal") // Volver al escenario normal al resetear
       setResultadosMonteCarlo(null)
     }
   }
@@ -169,6 +153,13 @@ export default function Page() {
 
   const toggleAutoPlay = () => {
     setAutoPlay((prev) => !prev)
+  }
+
+  const handleSimular = async () => {
+    if (!parametros) return
+    const resultado = await ejecutarSimulacion(parametros)
+    setResultados(resultado.resultados)
+    setPasos(resultado.pasos)
   }
 
   useEffect(() => {
@@ -201,39 +192,42 @@ export default function Page() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background relative overflow-hidden flex flex-col">
+      {/* Background decorative elements */}
       <div className="absolute inset-0 opacity-5 pointer-events-none">
         <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-[var(--bolivia-rojo)] to-transparent" />
         <div className="absolute top-32 left-0 w-full h-32 bg-gradient-to-b from-[var(--bolivia-amarillo)] to-transparent" />
         <div className="absolute top-64 left-0 w-full h-32 bg-gradient-to-b from-[var(--bolivia-verde)] to-transparent" />
       </div>
 
-      <div className="container mx-auto px-4 py-6 relative z-10 animate-fade-in">
+      {/* Main Content */}
+      <div className="container mx-auto px-4 py-6 relative z-10 animate-fade-in flex-1">
+        {/* Header Section - Mejorado */}
         <div className="mb-8">
-          <Card className="border-2 overflow-hidden shadow-lg animate-slide-in-up">
+          <Card className="border-2 overflow-hidden shadow-xl animate-slide-in-up bg-gradient-to-br from-card to-card/95 backdrop-blur-sm">
             <div className="h-2 gradient-bolivia" />
             <div className="p-6">
               <div className="flex items-center justify-between flex-wrap gap-4">
                 <div className="flex items-center gap-4">
-                  <div className="hidden sm:flex flex-col w-12 h-12 rounded-lg overflow-hidden shadow-md border-2 border-border">
+                  <div className="hidden sm:flex flex-col w-14 h-14 rounded-xl overflow-hidden shadow-lg border-2 border-border hover:scale-110 transition-transform">
                     <div className="h-1/3 bg-[#DA291C]" />
                     <div className="h-1/3 bg-[#FFD600]" />
                     <div className="h-1/3 bg-[#007A3D]" />
                   </div>
                   <div>
-                    <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-[var(--bolivia-verde)] via-[var(--bolivia-amarillo)] to-[var(--bolivia-rojo)] bg-clip-text text-transparent">
+                    <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-[var(--bolivia-verde)] via-[var(--bolivia-amarillo)] to-[var(--bolivia-rojo)] bg-clip-text text-transparent drop-shadow-sm">
                       Simulador Fiscal de Bolivia
                     </h1>
-                    <p className="text-muted-foreground text-sm mt-1">
-                      Modelo estocástico DSGE • Proyección fiscal 2020-2025
+                    <p className="text-muted-foreground text-sm mt-1 font-medium">
+                      Modelo estocástico DSGE
                     </p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 bg-muted/50 px-4 py-2 rounded-lg border">
+                <div className="flex items-center gap-3 bg-gradient-to-br from-muted/70 to-muted/40 px-5 py-3 rounded-xl border-2 shadow-sm hover:shadow-md transition-all">
                   <Calendar className="h-5 w-5 text-primary" />
                   <div className="flex items-center gap-2">
-                    <Label htmlFor="anos-header" className="text-sm font-medium whitespace-nowrap">
+                    <Label htmlFor="anos-header" className="text-sm font-semibold whitespace-nowrap">
                       Años:
                     </Label>
                     <Input
@@ -243,24 +237,32 @@ export default function Page() {
                       max={20}
                       value={parametros.anos}
                       onChange={(e) => setParametros({ ...parametros, anos: Number.parseInt(e.target.value) || 5 })}
-                      className="w-20 h-9 text-center font-bold"
+                      className="w-20 h-9 text-center font-bold shadow-sm"
                     />
                   </div>
                 </div>
 
-                <div className="flex gap-2">
+                <div className="flex gap-3">
+                  <Button
+                    variant="outline"
+                    onClick={() => setMostrarLanding(true)}
+                    className="shadow-sm hover:shadow-md transition-all border-2"
+                  >
+                    <X className="mr-2 h-4 w-4" />
+                    Salir
+                  </Button>
                   <Button
                     variant="outline"
                     onClick={resetear}
-                    className="shadow-sm hover:shadow-md transition-shadow bg-transparent"
+                    className="shadow-sm hover:shadow-md transition-all border-2 bg-transparent"
                   >
                     <RotateCcw className="mr-2 h-4 w-4" />
                     Resetear
                   </Button>
                   <Button
-                    onClick={() => ejecutarSimulacion(parametros)}
+                    onClick={handleSimular}
                     disabled={simulando || cargando}
-                    className="shadow-md hover:shadow-lg transition-all bg-gradient-to-r from-primary to-[var(--bolivia-verde)]"
+                    className="shadow-lg hover:shadow-xl transition-all bg-gradient-to-r from-primary to-[var(--bolivia-verde)] hover:scale-105"
                   >
                     {simulando || cargando ? (
                       <>
@@ -280,18 +282,19 @@ export default function Page() {
           </Card>
         </div>
 
+        {/* Tabs Section */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full animate-scale-in">
-          <TabsList className="grid w-full grid-cols-3 mb-6 h-auto p-1 bg-card shadow-lg border-2">
+          <TabsList className="grid w-full grid-cols-3 mb-6 h-auto p-1.5 bg-card shadow-xl border-2 rounded-xl">
             <TabsTrigger
               value="parametrizacion"
-              className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-[var(--bolivia-verde)] data-[state=active]:text-primary-foreground py-3 transition-all"
+              className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-[var(--bolivia-verde)] data-[state=active]:text-primary-foreground py-3 transition-all rounded-lg data-[state=active]:shadow-lg"
             >
               <Settings className="h-5 w-5" />
               <span className="font-semibold">Parametrización</span>
             </TabsTrigger>
             <TabsTrigger
               value="dashboard"
-              className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-[var(--bolivia-verde)] data-[state=active]:text-primary-foreground py-3 transition-all"
+              className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-[var(--bolivia-verde)] data-[state=active]:text-primary-foreground py-3 transition-all rounded-lg data-[state=active]:shadow-lg"
               disabled={!resultados}
             >
               <BarChart3 className="h-5 w-5" />
@@ -299,7 +302,7 @@ export default function Page() {
             </TabsTrigger>
             <TabsTrigger
               value="exportar"
-              className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-[var(--bolivia-verde)] data-[state=active]:text-primary-foreground py-3 transition-all"
+              className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-[var(--bolivia-verde)] data-[state=active]:text-primary-foreground py-3 transition-all rounded-lg data-[state=active]:shadow-lg"
               disabled={!resultados}
             >
               <Download className="h-5 w-5" />
@@ -512,7 +515,7 @@ export default function Page() {
           </TabsContent>
 
           <TabsContent value="dashboard" className="space-y-6 animate-fade-in">
-            {resultados && (
+            {resultados && resultados.length > 0 && (
               <>
                 {resultadosMonteCarlo && (
                   <Card className="p-6 shadow-lg border-2 bg-gradient-to-br from-blue-50 to-purple-50">
@@ -530,17 +533,21 @@ export default function Page() {
                               <div className="space-y-1 text-xs">
                                 <div className="flex justify-between">
                                   <span className="text-gray-600">P5 (optimista):</span>
-                                  <span className="font-mono">${stats.deficit_superavit.percentil_5.toFixed(0)}M</span>
+                                  <span className="font-mono">
+                                    Bs. {stats.deficit_superavit.percentil_5.toFixed(0)}M
+                                  </span>
                                 </div>
                                 <div className="flex justify-between">
                                   <span className="text-gray-600">P50 (mediana):</span>
                                   <span className="font-mono font-bold">
-                                    ${stats.deficit_superavit.mediana.toFixed(0)}M
+                                    Bs. {stats.deficit_superavit.mediana.toFixed(0)}M
                                   </span>
                                 </div>
                                 <div className="flex justify-between">
                                   <span className="text-gray-600">P95 (pesimista):</span>
-                                  <span className="font-mono">${stats.deficit_superavit.percentil_95.toFixed(0)}M</span>
+                                  <span className="font-mono">
+                                    Bs. {stats.deficit_superavit.percentil_95.toFixed(0)}M
+                                  </span>
                                 </div>
                               </div>
                             </div>
@@ -566,19 +573,19 @@ export default function Page() {
                             </div>
 
                             <div className="bg-white p-4 rounded-lg border-2 border-green-200">
-                              <p className="text-sm text-green-700 font-medium mb-2">RIN (millones USD)</p>
+                              <p className="text-sm text-green-700 font-medium mb-2">RIN (millones Bs.)</p>
                               <div className="space-y-1 text-xs">
                                 <div className="flex justify-between">
                                   <span className="text-gray-600">P5 (pesimista):</span>
-                                  <span className="font-mono">${stats.rin.percentil_5.toFixed(0)}M</span>
+                                  <span className="font-mono">Bs. {stats.rin.percentil_5.toFixed(0)}M</span>
                                 </div>
                                 <div className="flex justify-between">
                                   <span className="text-gray-600">P50 (mediana):</span>
-                                  <span className="font-mono font-bold">${stats.rin.mediana.toFixed(0)}M</span>
+                                  <span className="font-mono font-bold">Bs. {stats.rin.mediana.toFixed(0)}M</span>
                                 </div>
                                 <div className="flex justify-between">
                                   <span className="text-gray-600">P95 (optimista):</span>
-                                  <span className="font-mono">${stats.rin.percentil_95.toFixed(0)}M</span>
+                                  <span className="font-mono">Bs. {stats.rin.percentil_95.toFixed(0)}M</span>
                                 </div>
                               </div>
                             </div>
@@ -593,133 +600,16 @@ export default function Page() {
                     </p>
                   </Card>
                 )}
+                <ControlSimulacionFlotante
+                  resultados={resultados}
+                  anoVisualizacion={anoVisualizacion}
+                  autoPlay={autoPlay}
+                  toggleAutoPlay={toggleAutoPlay}
+                  avanzarAno={avanzarAno}
+                  retrocederAno={retrocederAno}
+                  irAlAno={irAlAno}
+                />
 
-
-                <Card className="border-2 gradient-bolivia sticky top-0 z-10 shadow-lg">
-                  <CardContent className="pt-6">
-                    <div className="space-y-4">
-                      {/* Year indicator and progress */}
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <h3 className="text-2xl font-bold">
-                            Año {resultados[anoVisualizacion].ano}
-                            <Badge className="ml-3 text-lg px-3 py-1" style={{ backgroundColor: VERDE_BOLIVIA }}>
-                              {anoVisualizacion + 1} / {resultados.length}
-                            </Badge>
-                          </h3>
-                          <p className="text-sm text-muted-foreground mt-1">
-                            Avance: {Math.round(((anoVisualizacion + 1) / resultados.length) * 100)}% completado
-                          </p>
-                        </div>
-                        <div className="flex gap-2">
-                          <Button
-                            onClick={() => irAlAno(0)}
-                            disabled={anoVisualizacion === 0}
-                            variant="outline"
-                            size="sm"
-                            title="Ir al inicio"
-                          >
-                            <ChevronsLeft className="h-5 w-5" />
-                          </Button>
-                          <Button
-                            onClick={retrocederAno}
-                            disabled={anoVisualizacion === 0}
-                            variant="outline"
-                            size="sm"
-                            title="Año anterior"
-                          >
-                            <ChevronLeft className="h-5 w-5" />
-                          </Button>
-                          <Button
-                            onClick={toggleAutoPlay}
-                            size="lg"
-                            className="px-6"
-                            style={{ backgroundColor: autoPlay ? "#EF4444" : VERDE_BOLIVIA }}
-                          >
-                            {autoPlay ? (
-                              <>
-                                <Pause className="h-5 w-5 mr-2" />
-                                Pausar
-                              </>
-                            ) : (
-                              <>
-                                <Play className="h-5 w-5 mr-2" />
-                                Auto-Simular
-                              </>
-                            )}
-                          </Button>
-                          <Button
-                            onClick={avanzarAno}
-                            disabled={anoVisualizacion === resultados.length - 1}
-                            variant="outline"
-                            size="sm"
-                            title="Año siguiente"
-                          >
-                            <ChevronRight className="h-5 w-5" />
-                          </Button>
-                          <Button
-                            onClick={() => irAlAno(resultados.length - 1)}
-                            disabled={anoVisualizacion === resultados.length - 1}
-                            variant="outline"
-                            size="sm"
-                            title="Ir al final"
-                          >
-                            <ChevronsRight className="h-5 w-5" />
-                          </Button>
-                        </div>
-                      </div>
-
-                      {/* Progress bar */}
-                      <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
-                        <div
-                          className="h-full transition-all duration-500 ease-out gradient-bolivia"
-                          style={{ width: `${((anoVisualizacion + 1) / resultados.length) * 100}%` }}
-                        />
-                      </div>
-
-                      {/* Key metrics for current year */}
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-2">
-                        <div className="bg-green-50 p-3 rounded-lg border border-green-200">
-                          <p className="text-xs text-green-700 font-medium">Ingresos</p>
-                          <p className="text-lg font-bold text-green-900">
-                            ${resultados[anoVisualizacion].ingresos_totales.toFixed(0)}M
-                          </p>
-                        </div>
-                        <div className="bg-red-50 p-3 rounded-lg border border-red-200">
-                          <p className="text-xs text-red-700 font-medium">Gastos</p>
-                          <p className="text-lg font-bold text-red-900">
-                            ${resultados[anoVisualizacion].gastos_totales.toFixed(0)}M
-                          </p>
-                        </div>
-                        <div
-                          className={`p-3 rounded-lg border ${resultados[anoVisualizacion].deficit_superavit > 0
-                            ? "bg-red-50 border-red-200"
-                            : "bg-green-50 border-green-200"
-                            }`}
-                        >
-                          <p
-                            className={`text-xs font-medium ${resultados[anoVisualizacion].deficit_superavit > 0 ? "text-red-700" : "text-green-700"
-                              }`}
-                          >
-                            {resultados[anoVisualizacion].deficit_superavit > 0 ? "Déficit" : "Superávit"}
-                          </p>
-                          <p
-                            className={`text-lg font-bold ${resultados[anoVisualizacion].deficit_superavit > 0 ? "text-red-900" : "text-green-900"
-                              }`}
-                          >
-                            ${Math.abs(resultados[anoVisualizacion].deficit_superavit).toFixed(0)}M
-                          </p>
-                        </div>
-                        <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
-                          <p className="text-xs text-blue-700 font-medium">RIN</p>
-                          <p className="text-lg font-bold text-blue-900">
-                            ${resultados[anoVisualizacion].rin.toFixed(0)}M
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
                 <Card className="border-2 shadow-lg">
                   <CardContent className="pt-6">
                     <Tabs value={dashboardSubTab} onValueChange={setDashboardSubTab}>
@@ -744,8 +634,6 @@ export default function Page() {
                     </Tabs>
                   </CardContent>
                 </Card>
-
-
 
                 <DiagramaRelaciones
                   resultado={resultados[anoVisualizacion]}
@@ -837,6 +725,120 @@ export default function Page() {
           </TabsContent>
         </Tabs>
       </div>
+
+      <footer className="relative z-10 border-t-2 bg-card/95 backdrop-blur-sm shadow-2xl mt-12">
+        <div className="h-1 gradient-bolivia" />
+        <div className="container mx-auto px-4 py-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Sección 1: Logo y descripción */}
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center gap-3">
+                <div className="flex flex-col w-10 h-10 rounded-lg overflow-hidden shadow-md border-2 border-border">
+                  <div className="h-1/3 bg-[#DA291C]" />
+                  <div className="h-1/3 bg-[#FFD600]" />
+                  <div className="h-1/3 bg-[#007A3D]" />
+                </div>
+                <h3 className="font-bold text-lg">Simulador Fiscal</h3>
+              </div>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Herramienta de análisis fiscal para Bolivia basada en modelos estocásticos DSGE. Desarrollado para
+                apoyar la toma de decisiones económicas.
+              </p>
+            </div>
+
+            {/* Sección 2: Enlaces rápidos */}
+            <div>
+              <h4 className="font-semibold text-sm mb-4 text-primary">Recursos</h4>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li>
+                  <a
+                    href="https://www.economiayfinanzas.gob.bo"
+                    target="_blank"
+                    className="hover:text-primary transition-colors flex items-center gap-2"
+                    rel="noreferrer"
+                  >
+                    <ExternalLink className="h-3 w-3" />
+                    Ministerio de Economía
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="https://www.bcb.gob.bo"
+                    target="_blank"
+                    className="hover:text-primary transition-colors flex items-center gap-2"
+                    rel="noreferrer"
+                  >
+                    <ExternalLink className="h-3 w-3" />
+                    Banco Central de Bolivia
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="https://www.ine.gob.bo"
+                    target="_blank"
+                    className="hover:text-primary transition-colors flex items-center gap-2"
+                    rel="noreferrer"
+                  >
+                    <ExternalLink className="h-3 w-3" />
+                    Instituto Nacional de Estadística
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="https://www.ypfb.gob.bo"
+                    target="_blank"
+                    className="hover:text-primary transition-colors flex items-center gap-2"
+                    rel="noreferrer"
+                  >
+                    <ExternalLink className="h-3 w-3" />
+                    YPFB Corporación
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            {/* Sección 3: Información técnica */}
+            <div>
+              <h4 className="font-semibold text-sm mb-4 text-primary">Información Técnica</h4>
+              <div className="space-y-3 text-sm text-muted-foreground">
+                <div className="flex items-start gap-2">
+                  <Activity className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="font-medium text-foreground">Método Box-Müller</p>
+                    <p className="text-xs">Simulación estocástica única</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2">
+                  <Zap className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="font-medium text-foreground">Monte Carlo</p>
+                    <p className="text-xs">Análisis de distribuciones probabilísticas</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2">
+                  <BarChart3 className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="font-medium text-foreground">Modelo DSGE</p>
+                    <p className="text-xs">Equilibrio general dinámico estocástico</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Línea divisoria */}
+          <div className="h-px bg-gradient-to-r from-transparent via-border to-transparent my-6" />
+
+          {/* Copyright y versión */}
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-muted-foreground">
+            <p>© 2025 Simulador Fiscal de Bolivia. Todos los derechos reservados.</p>
+            <div className="flex items-center gap-4">
+              <span className="px-3 py-1 bg-muted rounded-full text-xs font-medium">Versión 1.0.0</span>
+              <span className="text-xs">Última actualización: 2024</span>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }

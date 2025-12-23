@@ -7,7 +7,12 @@ def calcular_tipo_cambio(parametros, Z: float, shock_pct: float = 0.0) -> float:
     TC = base + coef_z*Z ± Shock%
     Now uses configurable parameters instead of hardcoded values
     """
-    tc = parametros.tc_base + parametros.tc_coef_z * Z
+    while (True):
+        Z = box_muller()
+        tc = parametros.tc_base + parametros.tc_coef_z * Z
+        print (f"TC: {tc}")
+        if (tc > 0):
+            break
     return aplicar_shock(tc, shock_pct)
 
 def calcular_ingresos_gas(parametros, Z: float, TC: float, shock_precio_pct: float = 0.0) -> Dict[str, float]:
@@ -15,10 +20,21 @@ def calcular_ingresos_gas(parametros, Z: float, TC: float, shock_precio_pct: flo
     Uses configurable gas parameters from ParametrosSimulacion
     """
     # Volumen de exportación (Toneladas)
-    Vg = parametros.gas_volumen_base + parametros.gas_volumen_coef_z * Z
-    
+    while (True): 
+        Z = box_muller()
+        Vg = parametros.gas_volumen_base + parametros.gas_volumen_coef_z * Z
+        print (f"VG: {Vg}")
+        if (Vg > 0):
+            break
+
     # Precio internacional ($/Tonelada)
-    Pg = parametros.gas_precio_base + parametros.gas_precio_coef_z * Z
+    while (True):
+        Z = box_muller()
+        Pg = parametros.gas_precio_base + parametros.gas_precio_coef_z * Z
+        print (f"PG: {Pg}")
+        if (Pg > 0):
+            break
+
     Pg = aplicar_shock(Pg, shock_precio_pct)
     
     # Ingresos brutos
@@ -41,8 +57,20 @@ def calcular_ingresos_oro(parametros, Z: float, TC: float, shock_precio_pct: flo
     """
     Uses configurable oro parameters
     """
-    VO = parametros.oro_volumen_base + parametros.oro_volumen_coef_z * Z
-    PO = parametros.oro_precio_base + parametros.oro_precio_coef_z * Z
+    while (True):
+        Z = box_muller()
+        VO = parametros.oro_volumen_base + parametros.oro_volumen_coef_z * Z
+        print (f"VO: {VO}")
+        if (VO > 0):
+            break
+
+    while (True):
+        Z = box_muller()
+        PO = parametros.oro_precio_base + parametros.oro_precio_coef_z * Z
+        print (f"PO: {PO}")
+        if (PO > 0):
+            break
+
     PO = aplicar_shock(PO, shock_precio_pct)
     IO = VO * PO * TC * (parametros.oro_tasa_regalias / 100)
     
@@ -52,8 +80,19 @@ def calcular_ingresos_plata(parametros, Z: float, TC: float, shock_precio_pct: f
     """
     Uses configurable plata parameters
     """
-    VP = parametros.plata_volumen_base + parametros.plata_volumen_coef_z * Z
-    PP = parametros.plata_precio_base + parametros.plata_precio_coef_z * Z
+    while (True):
+        Z = box_muller()
+        VP = parametros.plata_volumen_base + parametros.plata_volumen_coef_z * Z
+        print (f"VP: {VP}")
+        if (VP > 0):
+            break
+    while (True):
+        Z = box_muller()
+        PP = parametros.plata_precio_base + parametros.plata_precio_coef_z * Z
+        print (f"PP: {PP}")
+        if (PP > 0):
+            break
+
     PP = aplicar_shock(PP, shock_precio_pct)
     IP = VP * PP * TC * (parametros.plata_tasa_regalias / 100)
     
@@ -63,8 +102,20 @@ def calcular_ingresos_zinc(parametros, Z: float, TC: float, shock_precio_pct: fl
     """
     Uses configurable zinc parameters
     """
-    VZ = parametros.zinc_volumen_base + parametros.zinc_volumen_coef_z * Z
-    PZ = parametros.zinc_precio_base + parametros.zinc_precio_coef_z * Z
+    while (True):
+        Z = box_muller()
+        VZ = parametros.zinc_volumen_base + parametros.zinc_volumen_coef_z * Z
+        print (f"VZ: {VZ}")
+        if (VZ > 0):
+            break
+
+    while (True):
+        Z = box_muller()
+        PZ = parametros.zinc_precio_base + parametros.zinc_precio_coef_z * Z
+        print (f"PZ: {PZ}")
+        if (PZ > 0):
+            break
+
     PZ = aplicar_shock(PZ, shock_precio_pct)
     IZ = VZ * PZ * TC * (parametros.zinc_tasa_regalias / 100)
     
@@ -74,8 +125,20 @@ def calcular_ingresos_estano(parametros, Z: float, TC: float, shock_precio_pct: 
     """
     Uses configurable estano parameters
     """
-    VES = parametros.estano_volumen_base + parametros.estano_volumen_coef_z * Z
-    PES = parametros.estano_precio_base + parametros.estano_precio_coef_z * Z
+    while (True):
+        Z = box_muller()
+        VES = parametros.estano_volumen_base + parametros.estano_volumen_coef_z * Z
+        print (f"VES: {VES}")
+        if (VES > 0):
+            break
+    
+    while (True):
+        Z = box_muller()
+        PES = parametros.estano_precio_base + parametros.estano_precio_coef_z * Z
+        print (f"PES: {PES}")
+        if (PES > 0):
+            break
+
     PES = aplicar_shock(PES, shock_precio_pct)
     IES = VES * PES * TC * (parametros.estano_tasa_regalias / 100)
     
@@ -85,8 +148,20 @@ def calcular_ingresos_plomo(parametros, Z: float, TC: float, shock_precio_pct: f
     """
     Uses configurable plomo parameters
     """
-    VPL = parametros.plomo_volumen_base + parametros.plomo_volumen_coef_z * Z
-    PPL = parametros.plomo_precio_base + parametros.plomo_precio_coef_z * Z
+    while (True):
+        Z = box_muller()
+        VPL = parametros.plomo_volumen_base + parametros.plomo_volumen_coef_z * Z
+        print (f"VPL: {VPL}")
+        if (VPL > 0):
+            break
+    
+    while (True):
+        Z = box_muller()
+        PPL = parametros.plomo_precio_base + parametros.plomo_precio_coef_z * Z
+        print (f"PPL: {PPL}")
+        if (PPL > 0):
+            break
+
     PPL = aplicar_shock(PPL, shock_precio_pct)
     IPL = VPL * PPL * TC * (parametros.plomo_tasa_regalias / 100)
     

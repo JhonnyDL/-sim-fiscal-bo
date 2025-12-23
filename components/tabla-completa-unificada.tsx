@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Download, TrendingUp, TrendingDown, AlertTriangle } from "lucide-react"
+import { Download, TrendingUp, TrendingDown } from "lucide-react"
 import type { ResultadoAnual } from "@/lib/types"
 
 interface Props {
@@ -100,10 +100,10 @@ export default function TablaCompletaUnificada({ resultados, anoActual }: Props)
                                             <TableRow key={resultado.ano} className={idx % 2 === 0 ? "bg-gray-50" : ""}>
                                                 <TableCell className="font-medium">{resultado.ano}</TableCell>
                                                 <TableCell className="text-right text-green-600 font-semibold">
-                                                    ${resultado.ingresos_totales.toFixed(0)}M
+                                                    Bs.{resultado.ingresos_totales.toFixed(0)}M
                                                 </TableCell>
                                                 <TableCell className="text-right text-red-600 font-semibold">
-                                                    ${resultado.gastos_totales.toFixed(0)}M
+                                                    Bs.{resultado.gastos_totales.toFixed(0)}M
                                                 </TableCell>
                                                 <TableCell className="text-right">
                                                     <span
@@ -111,11 +111,13 @@ export default function TablaCompletaUnificada({ resultados, anoActual }: Props)
                                                             resultado.deficit_superavit > 0 ? "text-red-600 font-bold" : "text-green-600 font-bold"
                                                         }
                                                     >
-                                                        {resultado.deficit_superavit > 0 ? "-" : "+"}$
+                                                        {resultado.deficit_superavit > 0 ? "-" : "+"}Bs.
                                                         {Math.abs(resultado.deficit_superavit).toFixed(0)}M
                                                     </span>
                                                 </TableCell>
-                                                <TableCell className="text-right font-semibold">${resultado.deuda_total.toFixed(0)}M</TableCell>
+                                                <TableCell className="text-right font-semibold">
+                                                    Bs.{resultado.deuda_total.toFixed(0)}M
+                                                </TableCell>
                                                 <TableCell className="text-right">
                                                     <div className="flex items-center justify-end gap-2">
                                                         {resultado.deuda_pib_ratio.toFixed(1)}%
@@ -128,7 +130,7 @@ export default function TablaCompletaUnificada({ resultados, anoActual }: Props)
                                                 </TableCell>
                                                 <TableCell className="text-right">
                                                     <div className="flex items-center justify-end gap-2">
-                                                        ${resultado.rin.toFixed(0)}M
+                                                        Bs.{resultado.rin.toFixed(0)}M
                                                         {resultado.rin_meses_importacion < 3 && (
                                                             <Badge variant="destructive" className="text-xs">
                                                                 BAJO
@@ -136,10 +138,10 @@ export default function TablaCompletaUnificada({ resultados, anoActual }: Props)
                                                         )}
                                                     </div>
                                                 </TableCell>
-                                                <TableCell className="text-right">${resultado.pib.toFixed(0)}M</TableCell>
+                                                <TableCell className="text-right">Bs.{resultado.pib.toFixed(0)}M</TableCell>
                                                 <TableCell className="text-right">
                                                     <span className={resultado.saldo_comercial > 0 ? "text-green-600" : "text-red-600"}>
-                                                        {resultado.saldo_comercial > 0 ? "+" : ""}${resultado.saldo_comercial.toFixed(0)}M
+                                                        {resultado.saldo_comercial > 0 ? "+" : ""}Bs.{resultado.saldo_comercial.toFixed(0)}M
                                                     </span>
                                                 </TableCell>
                                             </TableRow>
@@ -149,243 +151,55 @@ export default function TablaCompletaUnificada({ resultados, anoActual }: Props)
                             </div>
                         </TabsContent>
 
-                        {/* Tab 2: Análisis de Deuda */}
+                        {/* Tab 2: Deuda Pública */}
                         <TabsContent value="deuda" className="space-y-6">
-                            {/*Tabla Principal de Deuda Desagregada */}
+                            {/*Tabla de Deuda Externa vs Interna */}
                             <div>
                                 <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                                    <div className="w-1 h-6 bg-purple-600 rounded"></div>
+                                    <div className="w-1 h-6 bg-orange-600 rounded"></div>
                                     Deuda Pública Desagregada (Externa vs Interna)
                                 </h3>
                                 <div className="rounded-md border overflow-x-auto">
                                     <Table>
                                         <TableHeader>
-                                            <TableRow className="bg-purple-400">
-                                                <TableHead className="font-bold" rowSpan={2}>
-                                                    Año
-                                                </TableHead>
-                                                <TableHead className="font-bold text-center" colSpan={3}>
-                                                    Deuda (MM Bs)
-                                                </TableHead>
-                                                <TableHead className="font-bold text-center" colSpan={2}>
-                                                    Cambio Anual
-                                                </TableHead>
-                                                <TableHead className="font-bold text-center" colSpan={3}>
-                                                    Servicio de Deuda (Intereses)
-                                                </TableHead>
-                                                <TableHead className="font-bold text-center" colSpan={3}>
-                                                    Ratios de Sostenibilidad
-                                                </TableHead>
-                                            </TableRow>
-                                            <TableRow className="bg-purple-200">
-                                                <TableHead className="text-right font-semibold">Externa</TableHead>
-                                                <TableHead className="text-right font-semibold">Interna</TableHead>
-                                                <TableHead className="text-right font-semibold">Total</TableHead>
-                                                <TableHead className="text-right font-semibold">Δ Externa</TableHead>
-                                                <TableHead className="text-right font-semibold">Δ Interna</TableHead>
-                                                <TableHead className="text-right font-semibold">Int. Externa</TableHead>
-                                                <TableHead className="text-right font-semibold">Int. Interna</TableHead>
-                                                <TableHead className="text-right font-semibold">Total</TableHead>
-                                                <TableHead className="text-right font-semibold">Ext./PIB%</TableHead>
-                                                <TableHead className="text-right font-semibold">Int./PIB%</TableHead>
-                                                <TableHead className="text-right font-semibold">Total/PIB%</TableHead>
-                                            </TableRow>
-                                        </TableHeader>
-                                        <TableBody>
-                                            {resultadosMostrar.map((resultado, idx) => {
-                                                const deudaExternaPib =
-                                                    resultado.deuda_externa ?? (resultado.deuda_externa / resultado.pib) * 100
-                                                const deudaInternaPib =
-                                                    resultado.deuda_interna ?? (resultado.deuda_interna / resultado.pib) * 100
-                                                const deltaExterna = resultado.deuda_externa ?? 0
-                                                const deltaInterna = resultado.deuda_interna ?? 0
-
-                                                const alertaExternaAlta = deudaExternaPib > 40
-                                                const alertaInternaAlta = deudaInternaPib > 30
-
-                                                return (
-                                                    <TableRow key={resultado.ano} className={idx % 2 === 0 ? "bg-gray-50" : ""}>
-                                                        <TableCell className="font-medium">{resultado.ano}</TableCell>
-
-                                                        {/* Deuda por Tipo */}
-                                                        <TableCell className="text-right font-semibold text-orange-700">
-                                                            ${resultado.deuda_externa.toFixed(0)}M
-                                                        </TableCell>
-                                                        <TableCell className="text-right font-semibold text-blue-700">
-                                                            ${resultado.deuda_interna.toFixed(0)}M
-                                                        </TableCell>
-                                                        <TableCell className="text-right font-bold">${resultado.deuda_total.toFixed(0)}M</TableCell>
-
-                                                        {/* Cambio Anual */}
-                                                        <TableCell className="text-right">
-                                                            <div className="flex items-center justify-end gap-1">
-                                                                {deltaExterna > 0 ? (
-                                                                    <TrendingUp className="h-3 w-3 text-red-500" />
-                                                                ) : (
-                                                                    <TrendingDown className="h-3 w-3 text-green-500" />
-                                                                )}
-                                                                <span className={deltaExterna > 0 ? "text-red-600" : "text-green-600"}>
-                                                                    {deltaExterna > 0 ? "+" : ""}
-                                                                    {deltaExterna.toFixed(0)}M
-                                                                </span>
-                                                            </div>
-                                                        </TableCell>
-                                                        <TableCell className="text-right">
-                                                            <div className="flex items-center justify-end gap-1">
-                                                                {deltaInterna > 0 ? (
-                                                                    <TrendingUp className="h-3 w-3 text-red-500" />
-                                                                ) : (
-                                                                    <TrendingDown className="h-3 w-3 text-green-500" />
-                                                                )}
-                                                                <span className={deltaInterna > 0 ? "text-red-600" : "text-green-600"}>
-                                                                    {deltaInterna > 0 ? "+" : ""}
-                                                                    {deltaInterna.toFixed(0)}M
-                                                                </span>
-                                                            </div>
-                                                        </TableCell>
-
-                                                        {/* Servicio de Deuda */}
-                                                        <TableCell className="text-right text-orange-600">
-                                                            ${resultado.intereses_deuda_externa.toFixed(0)}M
-                                                        </TableCell>
-                                                        <TableCell className="text-right text-blue-600">
-                                                            ${resultado.intereses_deuda_interna.toFixed(0)}M
-                                                        </TableCell>
-                                                        <TableCell className="text-right font-semibold">
-                                                            ${resultado.intereses_totales.toFixed(0)}M
-                                                        </TableCell>
-
-                                                        {/* Ratios de Sostenibilidad */}
-                                                        <TableCell className="text-right">
-                                                            <div className="flex items-center justify-end gap-2">
-                                                                {deudaExternaPib.toFixed(1)}%
-                                                                {alertaExternaAlta && (
-                                                                    <Badge variant="destructive" className="text-xs">
-                                                                        ALTO
-                                                                    </Badge>
-                                                                )}
-                                                            </div>
-                                                        </TableCell>
-                                                        <TableCell className="text-right">
-                                                            <div className="flex items-center justify-end gap-2">
-                                                                {deudaInternaPib.toFixed(1)}%
-                                                                {alertaInternaAlta && (
-                                                                    <Badge variant="destructive" className="text-xs">
-                                                                        ALTO
-                                                                    </Badge>
-                                                                )}
-                                                            </div>
-                                                        </TableCell>
-                                                        <TableCell className="text-right">
-                                                            <div className="flex items-center justify-end gap-2">
-                                                                <span className="font-bold">{resultado.deuda_pib_ratio.toFixed(1)}%</span>
-                                                                {resultado.deuda_pib_ratio > 70 && (
-                                                                    <Badge variant="destructive" className="text-xs">
-                                                                        CRÍTICO
-                                                                    </Badge>
-                                                                )}
-                                                            </div>
-                                                        </TableCell>
-                                                    </TableRow>
-                                                )
-                                            })}
-                                        </TableBody>
-                                    </Table>
-                                </div>
-                            </div>
-
-                            {/* Tabla de Composición y Capacidad de Pago */}
-                            <div>
-                                <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                                    <div className="w-1 h-6 bg-indigo-600 rounded"></div>
-                                    Composición de Deuda y Capacidad de Pago
-                                </h3>
-                                <div className="rounded-md border overflow-x-auto">
-                                    <Table>
-                                        <TableHeader>
-                                            <TableRow className="bg-indigo-100">
+                                            <TableRow className="bg-orange-100">
                                                 <TableHead>Año</TableHead>
-                                                <TableHead className="text-right">% Externa</TableHead>
-                                                <TableHead className="text-right">% Interna</TableHead>
-                                                <TableHead className="text-right">Intereses/Ingresos %</TableHead>
-                                                <TableHead className="text-right">Capacidad de Pago</TableHead>
-                                                <TableHead>Alertas</TableHead>
+                                                <TableHead className="text-right">Deuda Externa</TableHead>
+                                                <TableHead className="text-right">Δ Externa</TableHead>
+                                                <TableHead className="text-right">Deuda Interna</TableHead>
+                                                <TableHead className="text-right">Δ Interna</TableHead>
+                                                <TableHead className="text-right">Deuda Total</TableHead>
+                                                <TableHead className="text-right">Intereses Tot.</TableHead>
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
-                                            {resultadosMostrar.map((r, idx) => {
-                                                const ratioExterna = r.ratio_externa_total ?? (r.deuda_externa / r.deuda_total) * 100
-                                                const ratioInterna = r.ratio_interna_total ?? (r.deuda_interna / r.deuda_total) * 100
-                                                const interesesIngresosRatio =
-                                                    r.intereses_ingresos_ratio ?? (r.intereses_totales / r.ingresos_totales) * 100
-
-                                                const alertaInteresesAltos = interesesIngresosRatio > 20
-                                                const alertaCapacidadBaja = r.capacidad_pago < 3
-
-                                                return (
-                                                    <TableRow key={r.ano} className={idx % 2 === 0 ? "bg-gray-50" : ""}>
-                                                        <TableCell className="font-medium">{r.ano}</TableCell>
-                                                        <TableCell className="text-right">
-                                                            <div className="flex items-center justify-end gap-2">
-                                                                <div className="w-16 bg-gray-200 rounded-full h-2">
-                                                                    <div
-                                                                        className="bg-orange-500 h-2 rounded-full"
-                                                                        style={{ width: `${ratioExterna}%` }}
-                                                                    ></div>
-                                                                </div>
-                                                                <span>{ratioExterna.toFixed(1)}%</span>
-                                                            </div>
-                                                        </TableCell>
-                                                        <TableCell className="text-right">
-                                                            <div className="flex items-center justify-end gap-2">
-                                                                <div className="w-16 bg-gray-200 rounded-full h-2">
-                                                                    <div
-                                                                        className="bg-blue-500 h-2 rounded-full"
-                                                                        style={{ width: `${ratioInterna}%` }}
-                                                                    ></div>
-                                                                </div>
-                                                                <span>{ratioInterna.toFixed(1)}%</span>
-                                                            </div>
-                                                        </TableCell>
-                                                        <TableCell className="text-right">
-                                                            <div className="flex items-center justify-end gap-2">
-                                                                {interesesIngresosRatio.toFixed(1)}%
-                                                                {alertaInteresesAltos && (
-                                                                    <Badge variant="destructive" className="text-xs">
-                                                                        ALTO
-                                                                    </Badge>
-                                                                )}
-                                                            </div>
-                                                        </TableCell>
-                                                        <TableCell className="text-right">
-                                                            <div className="flex items-center justify-end gap-2">
-                                                                {r.capacidad_pago.toFixed(1)}x
-                                                                {alertaCapacidadBaja && (
-                                                                    <Badge variant="destructive" className="text-xs">
-                                                                        BAJO
-                                                                    </Badge>
-                                                                )}
-                                                            </div>
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            <div className="flex flex-col gap-1">
-                                                                {alertaInteresesAltos && (
-                                                                    <div className="flex items-center gap-1 text-xs text-red-600">
-                                                                        <AlertTriangle className="h-3 w-3" />
-                                                                        Intereses elevados
-                                                                    </div>
-                                                                )}
-                                                                {alertaCapacidadBaja && (
-                                                                    <div className="flex items-center gap-1 text-xs text-red-600">
-                                                                        <AlertTriangle className="h-3 w-3" />
-                                                                        Baja capacidad de pago
-                                                                    </div>
-                                                                )}
-                                                            </div>
-                                                        </TableCell>
-                                                    </TableRow>
-                                                )
-                                            })}
+                                            {resultadosMostrar.map((r, idx) => (
+                                                <TableRow key={r.ano} className={idx % 2 === 0 ? "bg-gray-50" : ""}>
+                                                    <TableCell className="font-medium">{r.ano}</TableCell>
+                                                    <TableCell className="text-right font-semibold text-orange-700">
+                                                        Bs.{r.deuda_externa.toFixed(0)}M
+                                                    </TableCell>
+                                                    <TableCell className="text-right">
+                                                        <span className={r.delta_deuda_externa > 0 ? "text-red-600" : "text-green-600"}>
+                                                            {r.delta_deuda_externa > 0 ? "+" : ""}
+                                                            {r.delta_deuda_externa.toFixed(0)}M
+                                                        </span>
+                                                    </TableCell>
+                                                    <TableCell className="text-right font-semibold text-blue-700">
+                                                        Bs.{r.deuda_interna.toFixed(0)}M
+                                                    </TableCell>
+                                                    <TableCell className="text-right">
+                                                        <span className={r.delta_deuda_interna > 0 ? "text-red-600" : "text-green-600"}>
+                                                            {r.delta_deuda_interna > 0 ? "+" : ""}
+                                                            {r.delta_deuda_interna.toFixed(0)}M
+                                                        </span>
+                                                    </TableCell>
+                                                    <TableCell className="text-right font-bold">Bs.{r.deuda_total.toFixed(0)}M</TableCell>
+                                                    <TableCell className="text-right text-red-600">
+                                                        Bs.{r.intereses_totales.toFixed(0)}M
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))}
                                         </TableBody>
                                     </Table>
                                 </div>
@@ -401,12 +215,6 @@ export default function TablaCompletaUnificada({ resultados, anoActual }: Props)
                                     <div>
                                         <span className="font-medium">Int. (Intereses):</span> Pago anual de intereses de la deuda
                                     </div>
-                                    <div>
-                                        <span className="font-medium">Intereses/Ingresos:</span> % de ingresos destinados a pagar intereses
-                                    </div>
-                                    <div>
-                                        <span className="font-medium">Capacidad de Pago:</span> Veces que los ingresos cubren los intereses
-                                    </div>
                                 </div>
                                 <div className="mt-3 pt-3 border-t">
                                     <h5 className="font-semibold mb-2">Alertas:</h5>
@@ -414,8 +222,6 @@ export default function TablaCompletaUnificada({ resultados, anoActual }: Props)
                                         <li>• Deuda Externa/PIB &gt; 40% = ALTO</li>
                                         <li>• Deuda Interna/PIB &gt; 30% = ALTO</li>
                                         <li>• Deuda Total/PIB &gt; 70% = CRÍTICO</li>
-                                        <li>• Intereses/Ingresos &gt; 20% = Presión fiscal elevada</li>
-                                        <li>• Capacidad de Pago &lt; 3x = Riesgo de insostenibilidad</li>
                                     </ul>
                                 </div>
                             </div>
@@ -453,17 +259,17 @@ export default function TablaCompletaUnificada({ resultados, anoActual }: Props)
                                                     <TableRow key={r.ano} className={idx % 2 === 0 ? "bg-gray-50" : ""}>
                                                         <TableCell className="font-medium">{r.ano}</TableCell>
                                                         <TableCell className="text-right font-semibold text-blue-700">
-                                                            ${r.ing_gas.toFixed(0)}M
+                                                            Bs.{r.ing_gas.toFixed(0)}M
                                                         </TableCell>
                                                         <TableCell className="text-right font-bold">
-                                                            ${r.ing_hidrocarburos_total.toFixed(0)}M
+                                                            Bs.{r.ing_hidrocarburos_total.toFixed(0)}M
                                                         </TableCell>
-                                                        <TableCell className="text-right text-amber-600">${r.ing_zinc.toFixed(0)}M</TableCell>
-                                                        <TableCell className="text-right text-gray-600">${r.ing_estano.toFixed(0)}M</TableCell>
-                                                        <TableCell className="text-right text-yellow-600">${r.ing_oro.toFixed(0)}M</TableCell>
-                                                        <TableCell className="text-right text-gray-400">${r.ing_plata.toFixed(0)}M</TableCell>
-                                                        <TableCell className="text-right text-cyan-600">${r.ing_litio.toFixed(0)}M</TableCell>
-                                                        <TableCell className="text-right font-bold">${r.ing_mineria_total.toFixed(0)}M</TableCell>
+                                                        <TableCell className="text-right text-amber-600">Bs.{r.ing_zinc.toFixed(0)}M</TableCell>
+                                                        <TableCell className="text-right text-gray-600">Bs.{r.ing_estano.toFixed(0)}M</TableCell>
+                                                        <TableCell className="text-right text-yellow-600">Bs.{r.ing_oro.toFixed(0)}M</TableCell>
+                                                        <TableCell className="text-right text-gray-400">Bs.{r.ing_plata.toFixed(0)}M</TableCell>
+                                                        <TableCell className="text-right text-cyan-600">Bs.{r.ing_litio.toFixed(0)}M</TableCell>
+                                                        <TableCell className="text-right font-bold">Bs.{r.ing_mineria_total.toFixed(0)}M</TableCell>
                                                         <TableCell className="text-right">
                                                             <Badge variant={porcentajeDelTotal > 40 ? "default" : "secondary"}>
                                                                 {porcentajeDelTotal.toFixed(1)}%
@@ -502,14 +308,14 @@ export default function TablaCompletaUnificada({ resultados, anoActual }: Props)
                                             {resultadosMostrar.map((r, idx) => (
                                                 <TableRow key={r.ano} className={idx % 2 === 0 ? "bg-gray-50" : ""}>
                                                     <TableCell className="font-medium">{r.ano}</TableCell>
-                                                    <TableCell className="text-right">${r.ing_iva.toFixed(0)}M</TableCell>
-                                                    <TableCell className="text-right">${r.ing_iue.toFixed(0)}M</TableCell>
-                                                    <TableCell className="text-right">${r.ing_it.toFixed(0)}M</TableCell>
-                                                    <TableCell className="text-right">${r.ing_itf.toFixed(0)}M</TableCell>
-                                                    <TableCell className="text-right">${r.ing_rc_iva.toFixed(0)}M</TableCell>
-                                                    <TableCell className="text-right">${r.ing_ice.toFixed(0)}M</TableCell>
-                                                    <TableCell className="text-right">${r.ing_ga.toFixed(0)}M</TableCell>
-                                                    <TableCell className="text-right font-bold">${r.ing_impuestos_total.toFixed(0)}M</TableCell>
+                                                    <TableCell className="text-right">Bs.{r.ing_iva.toFixed(0)}M</TableCell>
+                                                    <TableCell className="text-right">Bs.{r.ing_iue.toFixed(0)}M</TableCell>
+                                                    <TableCell className="text-right">Bs.{r.ing_it.toFixed(0)}M</TableCell>
+                                                    <TableCell className="text-right">Bs.{r.ing_itf.toFixed(0)}M</TableCell>
+                                                    <TableCell className="text-right">Bs.{r.ing_rc_iva.toFixed(0)}M</TableCell>
+                                                    <TableCell className="text-right">Bs.{r.ing_ice.toFixed(0)}M</TableCell>
+                                                    <TableCell className="text-right">Bs.{r.ing_ga.toFixed(0)}M</TableCell>
+                                                    <TableCell className="text-right font-bold">Bs.{r.ing_impuestos_total.toFixed(0)}M</TableCell>
                                                     <TableCell className="text-right">
                                                         <Badge variant={r.presion_tributaria < 15 ? "destructive" : "default"}>
                                                             {r.presion_tributaria.toFixed(1)}%
@@ -565,7 +371,7 @@ export default function TablaCompletaUnificada({ resultados, anoActual }: Props)
                                                                     )}
                                                                     <span className={deltaIngresos > 0 ? "text-green-600" : "text-red-600"}>
                                                                         {deltaIngresos > 0 ? "+" : ""}
-                                                                        {deltaIngresos.toFixed(0)}M
+                                                                        Bs.{deltaIngresos.toFixed(0)}M
                                                                     </span>
                                                                 </div>
                                                             )}
@@ -576,7 +382,7 @@ export default function TablaCompletaUnificada({ resultados, anoActual }: Props)
                                                             ) : (
                                                                 <span className={deltaHidrocarburos > 0 ? "text-green-600" : "text-red-600"}>
                                                                     {deltaHidrocarburos > 0 ? "+" : ""}
-                                                                    {deltaHidrocarburos.toFixed(0)}M
+                                                                    Bs.{deltaHidrocarburos.toFixed(0)}M
                                                                 </span>
                                                             )}
                                                         </TableCell>
@@ -586,7 +392,7 @@ export default function TablaCompletaUnificada({ resultados, anoActual }: Props)
                                                             ) : (
                                                                 <span className={deltaMineria > 0 ? "text-green-600" : "text-red-600"}>
                                                                     {deltaMineria > 0 ? "+" : ""}
-                                                                    {deltaMineria.toFixed(0)}M
+                                                                    Bs.{deltaMineria.toFixed(0)}M
                                                                 </span>
                                                             )}
                                                         </TableCell>
@@ -596,7 +402,7 @@ export default function TablaCompletaUnificada({ resultados, anoActual }: Props)
                                                             ) : (
                                                                 <span className={deltaImpuestos > 0 ? "text-green-600" : "text-red-600"}>
                                                                     {deltaImpuestos > 0 ? "+" : ""}
-                                                                    {deltaImpuestos.toFixed(0)}M
+                                                                    Bs.{deltaImpuestos.toFixed(0)}M
                                                                 </span>
                                                             )}
                                                         </TableCell>
@@ -610,20 +416,18 @@ export default function TablaCompletaUnificada({ resultados, anoActual }: Props)
                             </div>
                         </TabsContent>
 
-                        {/* Tab 4: Gastos Desagregados */}
+                        {/* Tab 4: Gastos Fiscales Desagregados */}
                         <TabsContent value="gastos" className="space-y-6">
                             <div>
                                 <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                                     <div className="w-1 h-6 bg-red-600 rounded"></div>
-                                    Gastos Corrientes y de Capital
+                                    Gastos Fiscales Desagregados
                                 </h3>
                                 <div className="rounded-md border overflow-x-auto">
                                     <Table>
                                         <TableHeader>
                                             <TableRow className="bg-red-100">
                                                 <TableHead>Año</TableHead>
-                                                <TableHead className="text-right">Sueldos y Salarios</TableHead>
-                                                <TableHead className="text-right">Bienes y Servicios</TableHead>
                                                 <TableHead className="text-right">Inversión Pública</TableHead>
                                                 <TableHead className="text-right">Total Gastos</TableHead>
                                                 <TableHead className="text-right">Gastos/PIB %</TableHead>
@@ -636,13 +440,11 @@ export default function TablaCompletaUnificada({ resultados, anoActual }: Props)
                                                 return (
                                                     <TableRow key={r.ano} className={idx % 2 === 0 ? "bg-gray-50" : ""}>
                                                         <TableCell className="font-medium">{r.ano}</TableCell>
-                                                        <TableCell className="text-right font-semibold">${r.gasto_sueldos.toFixed(0)}M</TableCell>
-                                                        <TableCell className="text-right">${r.gasto_bienes_servicios.toFixed(0)}M</TableCell>
                                                         <TableCell className="text-right font-semibold text-blue-700">
-                                                            ${r.gasto_inversion.toFixed(0)}M
+                                                            Bs.{r.gasto_inversion.toFixed(0)}M
                                                         </TableCell>
                                                         <TableCell className="text-right font-bold text-red-700">
-                                                            ${r.gastos_totales.toFixed(0)}M
+                                                            Bs.{r.gastos_totales.toFixed(0)}M
                                                         </TableCell>
                                                         <TableCell className="text-right">
                                                             <Badge variant={gastosPibRatio > 35 ? "destructive" : "default"}>
@@ -684,14 +486,14 @@ export default function TablaCompletaUnificada({ resultados, anoActual }: Props)
                                                     <TableRow key={r.ano} className={idx % 2 === 0 ? "bg-gray-50" : ""}>
                                                         <TableCell className="font-medium">{r.ano}</TableCell>
                                                         <TableCell className="text-right text-amber-700">
-                                                            ${r.gasto_subsidio_combustibles.toFixed(0)}M
+                                                            Bs.{r.gasto_subsidio_combustibles.toFixed(0)}M
                                                         </TableCell>
                                                         <TableCell className="text-right text-amber-700">
-                                                            ${r.gasto_subsidio_alimentos.toFixed(0)}M
+                                                            Bs.{r.gasto_subsidio_alimentos.toFixed(0)}M
                                                         </TableCell>
-                                                        <TableCell className="text-right font-bold">${totalSubsidios.toFixed(0)}M</TableCell>
+                                                        <TableCell className="text-right font-bold">Bs.{totalSubsidios.toFixed(0)}M</TableCell>
                                                         <TableCell className="text-right font-bold text-purple-700">
-                                                            ${r.intereses_totales.toFixed(0)}M
+                                                            Bs.{r.intereses_totales.toFixed(0)}M
                                                         </TableCell>
                                                         <TableCell className="text-right">
                                                             <div className="flex flex-col gap-1">
@@ -758,7 +560,7 @@ export default function TablaCompletaUnificada({ resultados, anoActual }: Props)
                                                                     )}
                                                                     <span className={deltaGastos > 0 ? "text-red-600" : "text-green-600"}>
                                                                         {deltaGastos > 0 ? "+" : ""}
-                                                                        {deltaGastos.toFixed(0)}M
+                                                                        Bs.{deltaGastos.toFixed(0)}M
                                                                     </span>
                                                                 </div>
                                                             )}
@@ -769,7 +571,7 @@ export default function TablaCompletaUnificada({ resultados, anoActual }: Props)
                                                             ) : (
                                                                 <span className={deltaInversion > 0 ? "text-green-600" : "text-red-600"}>
                                                                     {deltaInversion > 0 ? "+" : ""}
-                                                                    {deltaInversion.toFixed(0)}M
+                                                                    Bs.{deltaInversion.toFixed(0)}M
                                                                 </span>
                                                             )}
                                                         </TableCell>
@@ -779,7 +581,7 @@ export default function TablaCompletaUnificada({ resultados, anoActual }: Props)
                                                             ) : (
                                                                 <span className={deltaSubsidios > 0 ? "text-red-600" : "text-green-600"}>
                                                                     {deltaSubsidios > 0 ? "+" : ""}
-                                                                    {deltaSubsidios.toFixed(0)}M
+                                                                    Bs.{deltaSubsidios.toFixed(0)}M
                                                                 </span>
                                                             )}
                                                         </TableCell>
@@ -794,7 +596,7 @@ export default function TablaCompletaUnificada({ resultados, anoActual }: Props)
                                                                     r.resultado_primario > 0 ? "text-red-600 font-bold" : "text-green-600 font-bold"
                                                                 }
                                                             >
-                                                                {r.resultado_primario > 0 ? "-" : "+"}${Math.abs(r.resultado_primario).toFixed(0)}M
+                                                                {r.resultado_primario > 0 ? "-" : "+"} Bs.{Math.abs(r.resultado_primario).toFixed(0)}M
                                                             </span>
                                                         </TableCell>
                                                     </TableRow>

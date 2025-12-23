@@ -15,6 +15,8 @@ import {
   Filler,
 } from "chart.js"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import GraficasDetalladas from "./graficas-detalladas"
 import type { ResultadoAnual } from "@/lib/types"
 
 ChartJS.register(
@@ -80,7 +82,7 @@ export default function GraficosInteractivos({ resultados, anoActual = resultado
     labels: anosHastaAhora,
     datasets: [
       {
-        label: "Deuda Total (MM USD)",
+        label: "Deuda Total (MM Bs.)",
         data: resultadosHastaAhora.map((r) => r.deuda_total),
         borderColor: "#DA291C",
         backgroundColor: "rgba(218, 41, 28, 0.8)",
@@ -128,7 +130,7 @@ export default function GraficosInteractivos({ resultados, anoActual = resultado
     labels: anosHastaAhora,
     datasets: [
       {
-        label: "RIN (MM USD)",
+        label: "RIN (MM Bs.)",
         data: resultadosHastaAhora.map((r) => r.rin),
         borderColor: "#3B82F6",
         backgroundColor: "rgba(59, 130, 246, 0.1)",
@@ -138,7 +140,7 @@ export default function GraficosInteractivos({ resultados, anoActual = resultado
         yAxisID: "y",
       },
       {
-        label: "Saldo Comercial",
+        label: "Saldo Comercial (MM Bs.)",
         data: resultadosHastaAhora.map((r) => r.saldo_comercial),
         borderColor: "#007A3D",
         backgroundColor: "rgba(0, 122, 61, 0.1)",
@@ -174,7 +176,7 @@ export default function GraficosInteractivos({ resultados, anoActual = resultado
               label += ": "
             }
             if (context.parsed.y !== null) {
-              label += "$" + context.parsed.y.toFixed(0) + "M"
+              label += "Bs." + context.parsed.y.toFixed(0) + "M"
             }
             return label
           },
@@ -184,139 +186,153 @@ export default function GraficosInteractivos({ resultados, anoActual = resultado
   }
 
   return (
-    <div className="grid gap-6">
-      {/* Evolución Fiscal */}
-      <Card className="border-2 border-green-600">
-        <CardHeader style={{ backgroundColor: "#007A3D", color: "white" }}>
-          <CardTitle>Evolución Fiscal: Ingresos vs Gastos</CardTitle>
-          <CardDescription className="text-green-100">
-            Visualiza cómo los ingresos y gastos del Estado evolucionan año tras año y su impacto en el déficit fiscal
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="pt-6">
-          <Line data={dataEvolucionFiscal} options={optionsComunes} />
-        </CardContent>
-      </Card>
+    <Tabs defaultValue="resumen" className="w-full">
+      <TabsList className="grid w-full grid-cols-2 mb-6">
+        <TabsTrigger value="resumen">Resumen Ejecutivo</TabsTrigger>
+        <TabsTrigger value="detallado">Análisis Detallado</TabsTrigger>
+      </TabsList>
 
-      {/* Deuda y Sostenibilidad */}
-      <Card className="border-2 border-red-600">
-        <CardHeader style={{ backgroundColor: "#DA291C", color: "white" }}>
-          <CardTitle>Deuda Pública y Sostenibilidad Fiscal</CardTitle>
-          <CardDescription className="text-red-100">
-            Monitorea el crecimiento de la deuda y el ratio Deuda/PIB para evaluar riesgos fiscales
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="pt-6">
-          <Bar
-            data={dataDeuda}
-            options={{
-              ...optionsComunes,
-              scales: {
-                y: {
-                  type: "linear" as const,
-                  display: true,
-                  position: "left" as const,
-                  title: {
-                    display: true,
-                    text: "Deuda (MM USD)",
-                  },
-                },
-                y1: {
-                  type: "linear" as const,
-                  display: true,
-                  position: "right" as const,
-                  title: {
-                    display: true,
-                    text: "Deuda/PIB (%)",
-                  },
-                  grid: {
-                    drawOnChartArea: false,
-                  },
-                },
-              },
-            }}
-          />
-        </CardContent>
-      </Card>
+      <TabsContent value="resumen">
+        <div className="grid gap-6">
+          {/* Evolución Fiscal */}
+          <Card className="border-2 border-green-600">
+            <CardHeader style={{ backgroundColor: "#007A3D", color: "white" }}>
+              <CardTitle>Evolución Fiscal: Ingresos vs Gastos</CardTitle>
+              <CardDescription className="text-green-100">
+                Visualiza cómo los ingresos y gastos del Estado evolucionan año tras año y su impacto en el déficit
+                fiscal
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="pt-6">
+              <Line data={dataEvolucionFiscal} options={optionsComunes} />
+            </CardContent>
+          </Card>
 
-      <div className="grid md:grid-cols-2 gap-6">
-        {/* Composición de Ingresos */}
-        <Card className="border-2 border-yellow-500">
-          <CardHeader style={{ backgroundColor: "#FCD116" }}>
-            <CardTitle>Composición de Ingresos {ultimoResultado.ano}</CardTitle>
-            <CardDescription className="text-yellow-900">
-              Distribución porcentual de las fuentes de ingresos fiscales
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="pt-6 flex justify-center">
-            <div style={{ maxWidth: "400px", width: "100%" }}>
-              <Doughnut
-                data={dataIngresos}
+          {/* Deuda y Sostenibilidad */}
+          <Card className="border-2 border-red-600">
+            <CardHeader style={{ backgroundColor: "#DA291C", color: "white" }}>
+              <CardTitle>Deuda Pública y Sostenibilidad Fiscal</CardTitle>
+              <CardDescription className="text-red-100">
+                Monitorea el crecimiento de la deuda y el ratio Deuda/PIB para evaluar riesgos fiscales
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="pt-6">
+              <Bar
+                data={dataDeuda}
                 options={{
-                  responsive: true,
-                  plugins: {
-                    legend: {
-                      position: "bottom" as const,
+                  ...optionsComunes,
+                  scales: {
+                    y: {
+                      type: "linear" as const,
+                      display: true,
+                      position: "left" as const,
+                      title: {
+                        display: true,
+                        text: "Deuda (MM Bs.)",
+                      },
                     },
-                    tooltip: {
-                      callbacks: {
-                        label: (context: any) => {
-                          const label = context.label || ""
-                          const value = context.parsed
-                          const total = context.dataset.data.reduce((a: number, b: number) => a + b, 0)
-                          const percentage = ((value / total) * 100).toFixed(1)
-                          return `${label}: $${value.toFixed(0)}M (${percentage}%)`
-                        },
+                    y1: {
+                      type: "linear" as const,
+                      display: true,
+                      position: "right" as const,
+                      title: {
+                        display: true,
+                        text: "Deuda/PIB (%)",
+                      },
+                      grid: {
+                        drawOnChartArea: false,
                       },
                     },
                   },
                 }}
               />
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
 
-        {/* RIN y Sector Externo */}
-        <Card className="border-2 border-blue-500">
-          <CardHeader className="bg-blue-600 text-white">
-            <CardTitle>Reservas Internacionales (RIN) y Sector Externo</CardTitle>
-            <CardDescription className="text-blue-100">
-              Capacidad del país para cubrir importaciones y honrar deuda externa
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="pt-6">
-            <Line
-              data={dataSectorExterno}
-              options={{
-                ...optionsComunes,
-                scales: {
-                  y: {
-                    type: "linear" as const,
-                    display: true,
-                    position: "left" as const,
-                    title: {
-                      display: true,
-                      text: "RIN (MM USD)",
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Composición de Ingresos */}
+            <Card className="border-2 border-yellow-500">
+              <CardHeader style={{ backgroundColor: "#FCD116" }}>
+                <CardTitle>Composición de Ingresos {ultimoResultado.ano}</CardTitle>
+                <CardDescription className="text-yellow-900">
+                  Distribución porcentual de las fuentes de ingresos fiscales
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="pt-6 flex justify-center">
+                <div style={{ maxWidth: "400px", width: "100%" }}>
+                  <Doughnut
+                    data={dataIngresos}
+                    options={{
+                      responsive: true,
+                      plugins: {
+                        legend: {
+                          position: "bottom" as const,
+                        },
+                        tooltip: {
+                          callbacks: {
+                            label: (context: any) => {
+                              const label = context.label || ""
+                              const value = context.parsed
+                              const total = context.dataset.data.reduce((a: number, b: number) => a + b, 0)
+                              const percentage = ((value / total) * 100).toFixed(1)
+                              return `${label}: Bs.${value.toFixed(0)}M (${percentage}%)`
+                            },
+                          },
+                        },
+                      },
+                    }}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* RIN y Sector Externo */}
+            <Card className="border-2 border-blue-500">
+              <CardHeader className="bg-blue-600 text-white">
+                <CardTitle>Reservas Internacionales (RIN) y Sector Externo</CardTitle>
+                <CardDescription className="text-blue-100">
+                  Capacidad del país para cubrir importaciones y honrar deuda externa
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="pt-6">
+                <Line
+                  data={dataSectorExterno}
+                  options={{
+                    ...optionsComunes,
+                    scales: {
+                      y: {
+                        type: "linear" as const,
+                        display: true,
+                        position: "left" as const,
+                        title: {
+                          display: true,
+                          text: "RIN (MM Bs.)",
+                        },
+                      },
+                      y1: {
+                        type: "linear" as const,
+                        display: true,
+                        position: "right" as const,
+                        title: {
+                          display: true,
+                          text: "Saldo Comercial (MM Bs.)",
+                        },
+                        grid: {
+                          drawOnChartArea: false,
+                        },
+                      },
                     },
-                  },
-                  y1: {
-                    type: "linear" as const,
-                    display: true,
-                    position: "right" as const,
-                    title: {
-                      display: true,
-                      text: "Saldo Comercial (MM USD)",
-                    },
-                    grid: {
-                      drawOnChartArea: false,
-                    },
-                  },
-                },
-              }}
-            />
-          </CardContent>
-        </Card>
-      </div>
-    </div>
+                  }}
+                />
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </TabsContent>
+
+      <TabsContent value="detallado">
+        <GraficasDetalladas resultados={resultados} anoSeleccionado={anoActual} />
+      </TabsContent>
+    </Tabs>
   )
 }

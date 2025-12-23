@@ -1,5 +1,6 @@
 from typing import List, Dict, Optional
 import random
+import numpy as np
 from schemas import ParametrosSimulacion, ResultadoAnual, PasoSimulacion, ResultadoSimulacion, ResultadoMonteCarloAnual, EstadisticasVariable, ResultadoMonteCarloComplete
 from fiscal_model import calcular_ingresos, calcular_gastos, calcular_indicadores, calcular_deficit_deuda
 from stochastic import aplicar_volatilidad_precios, simular_shock
@@ -35,10 +36,6 @@ class SimuladorFiscalBolivia:
         deuda_externa_anterior = estado_anterior.deuda_externa if estado_anterior else self.parametros.deuda_externa_inicial
         deuda_interna_anterior = estado_anterior.deuda_interna if estado_anterior else self.parametros.deuda_interna_inicial
         rin_anterior = estado_anterior.rin if estado_anterior else self.parametros.rin_inicial
-        
-        # PASO 4: Calcular PIB (simplificado)
-        pib_anterior = estado_anterior.pib if estado_anterior else self.parametros.pib_inicial
-        pib = pib_anterior * (1 + self.parametros.crecimiento_pib / 100)
         
         # PASO 4: Calcular PIB (simplificado)
         pib_anterior = estado_anterior.pib if estado_anterior else self.parametros.pib_inicial
@@ -170,6 +167,7 @@ class SimuladorFiscalBolivia:
     def simular_monte_carlo(self, anos: int, num_simulaciones: int = 1000) -> 'ResultadoMonteCarloComplete':
         """
         Ejecuta múltiples simulaciones Monte Carlo para obtener distribuciones de probabilidad
+        OPTIMIZADO con NumPy para mejor rendimiento
         
         Args:
             anos: Número de años a simular
@@ -182,111 +180,128 @@ class SimuladorFiscalBolivia:
         # Almacenar todas las simulaciones
         todas_las_simulaciones: List[List[ResultadoAnual]] = []
         
-        print(f"Ejecutando {num_simulaciones} simulaciones Monte Carlo...")
+        print(f"Ejecutando {num_simulaciones} simulaciones Monte Carlo (OPTIMIZADO)...")
+        
+        # Esto es mucho más rápido que usar listas de Python
+        variables_tracking = {
+            'ingresos_totales': np.zeros((num_simulaciones, anos)),
+            'gastos_totales': np.zeros((num_simulaciones, anos)),
+            'deficit_superavit': np.zeros((num_simulaciones, anos)),
+            'deuda_total': np.zeros((num_simulaciones, anos)),
+            'deuda_pib_ratio': np.zeros((num_simulaciones, anos)),
+            'rin': np.zeros((num_simulaciones, anos)),
+            'rin_meses_importacion': np.zeros((num_simulaciones, anos)),
+            'deficit_pib_ratio': np.zeros((num_simulaciones, anos)),
+            'presion_tributaria': np.zeros((num_simulaciones, anos)),
+            'ing_gas': np.zeros((num_simulaciones, anos)),
+            'ing_mineria_total': np.zeros((num_simulaciones, anos)),
+            'ing_iva': np.zeros((num_simulaciones, anos)),
+            'ing_iue': np.zeros((num_simulaciones, anos)),
+            'gasto_subsidio_combustibles': np.zeros((num_simulaciones, anos)),
+            'delta_deuda_externa': np.zeros((num_simulaciones, anos)),
+            'delta_deuda_interna': np.zeros((num_simulaciones, anos)),
+            'deuda_externa_pib': np.zeros((num_simulaciones, anos)),
+            'deuda_interna_pib': np.zeros((num_simulaciones, anos)),
+            'ratio_externa_total': np.zeros((num_simulaciones, anos)),
+            'ratio_interna_total': np.zeros((num_simulaciones, anos)),
+            'intereses_ingresos_ratio': np.zeros((num_simulaciones, anos)),
+        }
+        
+        simulacion_representativa = None
         
         for sim_num in range(num_simulaciones):
             # Ejecutar una simulación completa
             resultado = self.simular(anos)
-            todas_las_simulaciones.append(resultado.resultados)
             
-            if (sim_num + 1) % 100 == 0:
+            # Extraer solo las métricas necesarias (no todo el objeto)
+            for ano_idx, resultado_ano in enumerate(resultado.resultados):
+                variables_tracking['ingresos_totales'][sim_num, ano_idx] = resultado_ano.ingresos_totales
+                variables_tracking['gastos_totales'][sim_num, ano_idx] = resultado_ano.gastos_totales
+                variables_tracking['deficit_superavit'][sim_num, ano_idx] = resultado_ano.deficit_superavit
+                variables_tracking['deuda_total'][sim_num, ano_idx] = resultado_ano.deuda_total
+                variables_tracking['deuda_pib_ratio'][sim_num, ano_idx] = resultado_ano.deuda_pib_ratio
+                variables_tracking['rin'][sim_num, ano_idx] = resultado_ano.rin
+                variables_tracking['rin_meses_importacion'][sim_num, ano_idx] = resultado_ano.rin_meses_importacion
+                variables_tracking['deficit_pib_ratio'][sim_num, ano_idx] = resultado_ano.deficit_pib_ratio
+                variables_tracking['presion_tributaria'][sim_num, ano_idx] = resultado_ano.presion_tributaria
+                variables_tracking['ing_gas'][sim_num, ano_idx] = resultado_ano.ing_gas
+                variables_tracking['ing_mineria_total'][sim_num, ano_idx] = resultado_ano.ing_mineria_total
+                variables_tracking['ing_iva'][sim_num, ano_idx] = resultado_ano.ing_iva
+                variables_tracking['ing_iue'][sim_num, ano_idx] = resultado_ano.ing_iue
+                variables_tracking['gasto_subsidio_combustibles'][sim_num, ano_idx] = resultado_ano.gasto_subsidio_combustibles
+                variables_tracking['delta_deuda_externa'][sim_num, ano_idx] = resultado_ano.delta_deuda_externa
+                variables_tracking['delta_deuda_interna'][sim_num, ano_idx] = resultado_ano.delta_deuda_interna
+                variables_tracking['deuda_externa_pib'][sim_num, ano_idx] = resultado_ano.deuda_externa_pib
+                variables_tracking['deuda_interna_pib'][sim_num, ano_idx] = resultado_ano.deuda_interna_pib
+                variables_tracking['ratio_externa_total'][sim_num, ano_idx] = resultado_ano.ratio_externa_total
+                variables_tracking['ratio_interna_total'][sim_num, ano_idx] = resultado_ano.ratio_interna_total
+                variables_tracking['intereses_ingresos_ratio'][sim_num, ano_idx] = resultado_ano.intereses_ingresos_ratio
+            
+            # Guardar la simulación del medio como representativa
+            if sim_num == num_simulaciones // 2:
+                simulacion_representativa = resultado.resultados
+            
+            if (sim_num + 1) % 50 == 0 or sim_num == 0:
                 print(f"  Completadas {sim_num + 1}/{num_simulaciones} simulaciones")
         
-        # Calcular estadísticas año por año
         resultados_mc: List[ResultadoMonteCarloAnual] = []
         
         for ano_idx in range(anos):
             ano_actual = 2020 + ano_idx
             
-            # Recolectar valores de todas las simulaciones para este año
-            valores = {
-                'ingresos_totales': [],
-                'gastos_totales': [],
-                'deficit_superavit': [],
-                'deuda_total': [],
-                'deuda_pib_ratio': [],
-                'rin': [],
-                'rin_meses_importacion': [],
-                'deficit_pib_ratio': [],
-                'presion_tributaria': [],
-                'ing_gas': [],
-                'ing_mineria_total': [],
-                'ing_iva': [],
-                'ing_iue': [],
-                'gasto_subsidio_combustibles': [],
-                # Nuevos campos agregados
-                'delta_deuda_externa': [],
-                'delta_deuda_interna': [],
-                'deuda_externa_pib': [],
-                'deuda_interna_pib': [],
-                'ratio_externa_total': [],
-                'ratio_interna_total': [],
-                'intereses_ingresos_ratio': [],
-            }
-            
-            for sim in todas_las_simulaciones:
-                resultado_ano = sim[ano_idx]
-                for key in valores.keys():
-                    valores[key].append(getattr(resultado_ano, key))
-            
-            # Calcular estadísticas para cada variable
-            def calcular_estadisticas(datos: List[float]) -> EstadisticasVariable:
-                import numpy as np
-                datos_array = np.array(datos)
+            def calcular_estadisticas_rapido(datos_col: np.ndarray) -> EstadisticasVariable:
                 return EstadisticasVariable(
-                    promedio=float(np.mean(datos_array)),
-                    mediana=float(np.median(datos_array)),
-                    desviacion_estandar=float(np.std(datos_array)),
-                    percentil_5=float(np.percentile(datos_array, 5)),
-                    percentil_25=float(np.percentile(datos_array, 25)),
-                    percentil_75=float(np.percentile(datos_array, 75)),
-                    percentil_95=float(np.percentile(datos_array, 95)),
-                    minimo=float(np.min(datos_array)),
-                    maximo=float(np.max(datos_array))
+                    promedio=float(np.mean(datos_col)),
+                    mediana=float(np.median(datos_col)),
+                    desviacion_estandar=float(np.std(datos_col)),
+                    percentil_5=float(np.percentile(datos_col, 5)),
+                    percentil_25=float(np.percentile(datos_col, 25)),
+                    percentil_75=float(np.percentile(datos_col, 75)),
+                    percentil_95=float(np.percentile(datos_col, 95)),
+                    minimo=float(np.min(datos_col)),
+                    maximo=float(np.max(datos_col))
                 )
             
-            # Crear resultado para este año
             resultado_mc_ano = ResultadoMonteCarloAnual(
                 ano=ano_actual,
-                ingresos_totales=calcular_estadisticas(valores['ingresos_totales']),
-                gastos_totales=calcular_estadisticas(valores['gastos_totales']),
-                deficit_superavit=calcular_estadisticas(valores['deficit_superavit']),
-                deuda_total=calcular_estadisticas(valores['deuda_total']),
-                deuda_pib_ratio=calcular_estadisticas(valores['deuda_pib_ratio']),
-                rin=calcular_estadisticas(valores['rin']),
-                rin_meses_importacion=calcular_estadisticas(valores['rin_meses_importacion']),
-                deficit_pib_ratio=calcular_estadisticas(valores['deficit_pib_ratio']),
-                presion_tributaria=calcular_estadisticas(valores['presion_tributaria']),
-                ing_gas=calcular_estadisticas(valores['ing_gas']),
-                ing_mineria_total=calcular_estadisticas(valores['ing_mineria_total']),
-                ing_iva=calcular_estadisticas(valores['ing_iva']),
-                ing_iue=calcular_estadisticas(valores['ing_iue']),
-                gasto_subsidio_combustibles=calcular_estadisticas(valores['gasto_subsidio_combustibles']),
-                # Distribuciones completas para histogramas
-                distribucion_deficit=valores['deficit_superavit'],
-                distribucion_deuda_pib=valores['deuda_pib_ratio'],
-                distribucion_rin=valores['rin'],
-                # Nuevos campos agregados
-                distribucion_delta_deuda_externa=valores['delta_deuda_externa'],
-                distribucion_delta_deuda_interna=valores['delta_deuda_interna'],
-                distribucion_deuda_externa_pib=valores['deuda_externa_pib'],
-                distribucion_deuda_interna_pib=valores['deuda_interna_pib'],
-                distribucion_ratio_externa_total=valores['ratio_externa_total'],
-                distribucion_ratio_interna_total=valores['ratio_interna_total'],
-                distribucion_intereses_ingresos_ratio=valores['intereses_ingresos_ratio'],
+                ingresos_totales=calcular_estadisticas_rapido(variables_tracking['ingresos_totales'][:, ano_idx]),
+                gastos_totales=calcular_estadisticas_rapido(variables_tracking['gastos_totales'][:, ano_idx]),
+                deficit_superavit=calcular_estadisticas_rapido(variables_tracking['deficit_superavit'][:, ano_idx]),
+                deuda_total=calcular_estadisticas_rapido(variables_tracking['deuda_total'][:, ano_idx]),
+                deuda_pib_ratio=calcular_estadisticas_rapido(variables_tracking['deuda_pib_ratio'][:, ano_idx]),
+                rin=calcular_estadisticas_rapido(variables_tracking['rin'][:, ano_idx]),
+                rin_meses_importacion=calcular_estadisticas_rapido(variables_tracking['rin_meses_importacion'][:, ano_idx]),
+                deficit_pib_ratio=calcular_estadisticas_rapido(variables_tracking['deficit_pib_ratio'][:, ano_idx]),
+                presion_tributaria=calcular_estadisticas_rapido(variables_tracking['presion_tributaria'][:, ano_idx]),
+                ing_gas=calcular_estadisticas_rapido(variables_tracking['ing_gas'][:, ano_idx]),
+                ing_mineria_total=calcular_estadisticas_rapido(variables_tracking['ing_mineria_total'][:, ano_idx]),
+                ing_iva=calcular_estadisticas_rapido(variables_tracking['ing_iva'][:, ano_idx]),
+                ing_iue=calcular_estadisticas_rapido(variables_tracking['ing_iue'][:, ano_idx]),
+                gasto_subsidio_combustibles=calcular_estadisticas_rapido(variables_tracking['gasto_subsidio_combustibles'][:, ano_idx]),
+                # Distribuciones completas para histogramas (convertir a lista)
+                distribucion_deficit=variables_tracking['deficit_superavit'][:, ano_idx].tolist(),
+                distribucion_deuda_pib=variables_tracking['deuda_pib_ratio'][:, ano_idx].tolist(),
+                distribucion_rin=variables_tracking['rin'][:, ano_idx].tolist(),
+                distribucion_delta_deuda_externa=variables_tracking['delta_deuda_externa'][:, ano_idx].tolist(),
+                distribucion_delta_deuda_interna=variables_tracking['delta_deuda_interna'][:, ano_idx].tolist(),
+                distribucion_deuda_externa_pib=variables_tracking['deuda_externa_pib'][:, ano_idx].tolist(),
+                distribucion_deuda_interna_pib=variables_tracking['deuda_interna_pib'][:, ano_idx].tolist(),
+                distribucion_ratio_externa_total=variables_tracking['ratio_externa_total'][:, ano_idx].tolist(),
+                distribucion_ratio_interna_total=variables_tracking['ratio_interna_total'][:, ano_idx].tolist(),
+                distribucion_intereses_ingresos_ratio=variables_tracking['intereses_ingresos_ratio'][:, ano_idx].tolist(),
             )
             
             resultados_mc.append(resultado_mc_ano)
         
-        # Tomar una simulación representativa (la que está más cerca de la mediana)
-        simulacion_representativa = todas_las_simulaciones[num_simulaciones // 2]
+        print(f"✓ Monte Carlo completado: {num_simulaciones} simulaciones")
         
         return ResultadoMonteCarloComplete(
             num_simulaciones=num_simulaciones,
             resultados_estadisticos=resultados_mc,
             simulacion_representativa=simulacion_representativa,
-            metodo="Monte Carlo con Box-Müller"
+            metodo="Monte Carlo optimizado con NumPy"
         )
+
 def aplicar_volatilidad_precios(precio_base: float, volatilidad_pct: float) -> float:
     """
     Aplica un cambio estocástico al precio usando volatilidad porcentual.
