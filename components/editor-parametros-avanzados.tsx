@@ -130,22 +130,6 @@ export interface ParametrosModeloCompleto {
 
   // NUEVOS: Flag para activar/desactivar subsidios a combustibles
   subsidio_combustibles_activo: boolean
-
-  // NUEVOS: Campos para Petróleo y otros Commodities (añadidos implícitamente por las updates)
-  petroleo_volumen_base?: number
-  petroleo_volumen_coef_z?: number
-  petroleo_precio_base?: number
-  petroleo_precio_coef_z?: number
-  petroleo_tasa_regalias?: number
-
-  // NUEVOS: Campos para Impuestos (añadidos implícitamente por las updates)
-  iue_base_coef_z?: number
-  it_base_coef_z?: number
-  iva_base_coef_z?: number
-  ice_base_coef_z?: number
-  cv_coef_z?: number
-  gasto_corriente_coef_z?: number
-  subsidio_alimentos_coef_z?: number
 }
 
 // CHANGE: Eliminando PARAMETROS_MODELO_DEFAULT hardcodeado - ahora se carga desde el backend
@@ -167,14 +151,12 @@ export function EditorParametrosAvanzados({
   const [tab, setTab] = useState("rf1")
 
   const handleChange = (key: keyof ParametrosModeloCompleto, value: number) => {
-    const nuevosParametros = { ...parametros, [key]: value }
-    onParametrosChange(nuevosParametros)
+    onParametrosChange({ ...parametros, [key]: value })
   }
 
   // Modified to accept any key, not just specific ones.
   const handleParameterChange = (key: keyof ParametrosModeloCompleto, value: number | boolean) => {
-    const nuevosParametros = { ...parametros, [key]: value }
-    onParametrosChange(nuevosParametros)
+    onParametrosChange({ ...parametros, [key]: value })
   }
 
   const resetearGrupo = (grupo: string) => {
@@ -243,12 +225,6 @@ export function EditorParametrosAvanzados({
         plomo_precio_base: parametrosDefault.plomo_precio_base,
         plomo_precio_coef_z: parametrosDefault.plomo_precio_coef_z,
         plomo_tasa_regalias: parametrosDefault.plomo_tasa_regalias,
-        // Petroleo (si existe en defaults)
-        petroleo_volumen_base: parametrosDefault.petroleo_volumen_base,
-        petroleo_volumen_coef_z: parametrosDefault.petroleo_volumen_coef_z,
-        petroleo_precio_base: parametrosDefault.petroleo_precio_base,
-        petroleo_precio_coef_z: parametrosDefault.petroleo_precio_coef_z,
-        petroleo_tasa_regalias: parametrosDefault.petroleo_tasa_regalias,
       },
       // RF5: Impuestos
       impuestos: {
@@ -278,12 +254,6 @@ export function EditorParametrosAvanzados({
         iehd_mi_coef_z: parametrosDefault.iehd_mi_coef_z,
         iehd_i_base: parametrosDefault.iehd_i_base,
         iehd_i_coef_z: parametrosDefault.iehd_i_coef_z,
-        // Nuevos campos de impuestos que podrian estar en defaults
-        iue_base_coef_z: parametrosDefault.iue_base_coef_z,
-        it_base_coef_z: parametrosDefault.it_base_coef_z,
-        iva_base_coef_z: parametrosDefault.iva_base_coef_z,
-        ice_base_coef_z: parametrosDefault.ice_base_coef_z,
-        cv_coef_z: parametrosDefault.cv_coef_z,
       },
       // RF6: Gastos
       gastos: {
@@ -440,7 +410,7 @@ export function EditorParametrosAvanzados({
 
               <div className="space-y-2">
                 <Label htmlFor="deuda_externa_inicial" className="font-semibold">
-                  Deuda Externa Inicial (MM Bs.)
+                  Deuda Externa Inicial (Bs)
                 </Label>
                 <Input
                   id="deuda_externa_inicial"
@@ -453,7 +423,7 @@ export function EditorParametrosAvanzados({
 
               <div className="space-y-2">
                 <Label htmlFor="deuda_interna_inicial" className="font-semibold">
-                  Deuda Interna Inicial (MM Bs.)
+                  Deuda Interna Inicial (Bs)
                 </Label>
                 <Input
                   id="deuda_interna_inicial"
@@ -466,7 +436,7 @@ export function EditorParametrosAvanzados({
 
               <div className="space-y-2">
                 <Label htmlFor="rin_inicial" className="font-semibold">
-                  RIN Inicial (MM Bs.)
+                  RIN Inicial (Bs)
                 </Label>
                 <Input
                   id="rin_inicial"
@@ -629,7 +599,7 @@ export function EditorParametrosAvanzados({
             </div>
             <div className="bg-muted/50 p-4 rounded-lg">
               <p className="text-sm text-muted-foreground mb-2">
-                Fórmula: <code className="bg-background px-2 py-1 rounded">TC = Base + Coef_Z × Z</code>
+                Fórmula: <code className="bg-background px-2 py-1 rounded">TC = Base + Desviacion × Z</code>
               </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -646,10 +616,9 @@ export function EditorParametrosAvanzados({
                   className="font-mono"
                 />
               </div>
-
               <div className="space-y-2">
                 <Label htmlFor="tc_coef_z" className="font-semibold">
-                  Desviación Estocástica
+                  Desviacion
                 </Label>
                 <Input
                   id="tc_coef_z"
@@ -693,7 +662,7 @@ export function EditorParametrosAvanzados({
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-xs font-semibold">Desviación de Volumen</Label>
+                  <Label className="text-xs font-semibold">Desviacion Volumen</Label>
                   <Input
                     type="number"
                     step="1000"
@@ -713,7 +682,7 @@ export function EditorParametrosAvanzados({
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-xs font-semibold">Desviación de Precio</Label>
+                  <Label className="text-xs font-semibold">Desviacion Precio</Label>
                   <Input
                     type="number"
                     step="0.01"
@@ -819,21 +788,6 @@ export function EditorParametrosAvanzados({
               onChangePrecioCoefZ={(v) => handleChange("plomo_precio_coef_z", v)}
               onChangeTasaRegalias={(v) => handleChange("plomo_tasa_regalias", v)}
             />
-
-            {/* Petroleo */}
-            <RecursoMineralEditor
-              nombre="Petróleo"
-              volumeBase={parametros.petroleo_volumen_base}
-              volumeCoefZ={parametros.petroleo_volumen_coef_z}
-              precioBase={parametros.petroleo_precio_base}
-              precioCoefZ={parametros.petroleo_precio_coef_z}
-              tasaRegalias={parametros.petroleo_tasa_regalias}
-              onChangeVolumeBase={(v) => handleChange("petroleo_volumen_base", v)}
-              onChangeVolumeCoefZ={(v) => handleChange("petroleo_volumen_coef_z", v)}
-              onChangePrecioBase={(v) => handleChange("petroleo_precio_base", v)}
-              onChangePrecioCoefZ={(v) => handleChange("petroleo_precio_coef_z", v)}
-              onChangeTasaRegalias={(v) => handleChange("petroleo_tasa_regalias", v)}
-            />
           </TabsContent>
 
           {/* Impuestos */}
@@ -851,7 +805,7 @@ export function EditorParametrosAvanzados({
             <div className="bg-muted/50 p-4 rounded-lg">
               <p className="text-sm text-muted-foreground">
                 Todos los impuestos siguen:{" "}
-                <code className="bg-background px-2 py-1 rounded">I = Base + Coef_Z × Z</code>
+                <code className="bg-background px-2 py-1 rounded">I = Base + Desviacion × Z</code>
               </p>
             </div>
             <div className="grid gap-3">
@@ -946,43 +900,6 @@ export function EditorParametrosAvanzados({
                 onChangeBase={(v) => handleChange("iehd_i_base", v)}
                 onChangeCoefZ={(v) => handleChange("iehd_i_coef_z", v)}
               />
-
-              {/* Nuevos campos de impuestos, probablemente con coef_z como desviación estocástica */}
-              <ImpuestoEditor
-                nombre="IUE (Base)"
-                base={parametros.iue_base}
-                coefZ={parametros.iue_base_coef_z}
-                onChangeBase={(v) => handleChange("iue_base", v)}
-                onChangeCoefZ={(v) => handleChange("iue_base_coef_z", v)}
-              />
-              <ImpuestoEditor
-                nombre="IT (Base)"
-                base={parametros.it_base}
-                coefZ={parametros.it_base_coef_z}
-                onChangeBase={(v) => handleChange("it_base", v)}
-                onChangeCoefZ={(v) => handleChange("it_base_coef_z", v)}
-              />
-              <ImpuestoEditor
-                nombre="IVA (Base)"
-                base={parametros.iva_mi_base} // Asumiendo que es IVA MI
-                coefZ={parametros.iva_base_coef_z}
-                onChangeBase={(v) => handleChange("iva_mi_base", v)}
-                onChangeCoefZ={(v) => handleChange("iva_base_coef_z", v)}
-              />
-              <ImpuestoEditor
-                nombre="ICE (Base)"
-                base={parametros.ice_mi_base} // Asumiendo que es ICE MI
-                coefZ={parametros.ice_base_coef_z}
-                onChangeBase={(v) => handleChange("ice_mi_base", v)}
-                onChangeCoefZ={(v) => handleChange("ice_base_coef_z", v)}
-              />
-              <ImpuestoEditor
-                nombre="CV (Base)"
-                base={parametros.cv_base}
-                coefZ={parametros.cv_coef_z}
-                onChangeBase={(v) => handleChange("cv_base", v)}
-                onChangeCoefZ={(v) => handleChange("cv_coef_z", v)}
-              />
             </div>
           </TabsContent>
 
@@ -1013,7 +930,7 @@ export function EditorParametrosAvanzados({
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-xs font-semibold">Desviación Estocástica</Label>
+                    <Label className="text-xs font-semibold">Desviacion</Label>
                     <Input
                       type="number"
                       step="1000000"
@@ -1039,7 +956,7 @@ export function EditorParametrosAvanzados({
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-xs font-semibold">Desviación Estocástica</Label>
+                    <Label className="text-xs font-semibold">Desviacion</Label>
                     <Input
                       type="number"
                       step="1000000"
@@ -1117,7 +1034,7 @@ export function EditorParametrosAvanzados({
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-xs font-semibold">Desviación de Precio Import.</Label>
+                    <Label className="text-xs font-semibold">Desviacion Precio Import</Label>
                     <Input
                       type="number"
                       step="0.01"
@@ -1141,7 +1058,7 @@ export function EditorParametrosAvanzados({
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-xs font-semibold">Desviación de Volumen Import.</Label>
+                    <Label className="text-xs font-semibold">Desviacion Volumen Import </Label>
                     <Input
                       type="number"
                       step="1000"
@@ -1183,7 +1100,7 @@ export function EditorParametrosAvanzados({
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-xs font-semibold">Desviación de Precio Import.</Label>
+                    <Label className="text-xs font-semibold">Desviacion Precio Import</Label>
                     <Input
                       type="number"
                       step="0.01"
@@ -1207,7 +1124,7 @@ export function EditorParametrosAvanzados({
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-xs font-semibold">Desviación de Volumen Import.</Label>
+                    <Label className="text-xs font-semibold">Desviacion Volumen Import</Label>
                     <Input
                       type="number"
                       step="1000"
@@ -1241,11 +1158,11 @@ export function EditorParametrosAvanzados({
 // Componente auxiliar para editar recursos minerales
 interface RecursoMineralEditorProps {
   nombre: string
-  volumeBase?: number
-  volumeCoefZ?: number
-  precioBase?: number
-  precioCoefZ?: number
-  tasaRegalias?: number
+  volumeBase: number
+  volumeCoefZ: number
+  precioBase: number
+  precioCoefZ: number
+  tasaRegalias: number
   onChangeVolumeBase: (v: number) => void
   onChangeVolumeCoefZ: (v: number) => void
   onChangePrecioBase: (v: number) => void
@@ -1274,18 +1191,18 @@ function RecursoMineralEditor({
           <Label className="text-xs font-semibold">Volumen Base (Ton)</Label>
           <Input
             type="number"
-            step="0.01" // Ajustado para ser más flexible
-            value={volumeBase ?? 0}
+            step="0.01"
+            value={volumeBase}
             onChange={(e) => onChangeVolumeBase(Number.parseFloat(e.target.value))}
             className="font-mono"
           />
         </div>
         <div className="space-y-2">
-          <Label className="text-xs font-semibold">Desviación de Volumen</Label>
+          <Label className="text-xs font-semibold">Desviacion Volumen</Label>
           <Input
             type="number"
-            step="0.01" // Ajustado para ser más flexible
-            value={volumeCoefZ ?? 0}
+            step="0.01"
+            value={volumeCoefZ}
             onChange={(e) => onChangeVolumeCoefZ(Number.parseFloat(e.target.value))}
             className="font-mono"
           />
@@ -1295,17 +1212,17 @@ function RecursoMineralEditor({
           <Input
             type="number"
             step="0.01"
-            value={precioBase ?? 0}
+            value={precioBase}
             onChange={(e) => onChangePrecioBase(Number.parseFloat(e.target.value))}
             className="font-mono"
           />
         </div>
         <div className="space-y-2">
-          <Label className="text-xs font-semibold">Desviación de Precio</Label>
+          <Label className="text-xs font-semibold">Desviacion Precio</Label>
           <Input
             type="number"
             step="0.01"
-            value={precioCoefZ ?? 0}
+            value={precioCoefZ}
             onChange={(e) => onChangePrecioCoefZ(Number.parseFloat(e.target.value))}
             className="font-mono"
           />
@@ -1315,7 +1232,7 @@ function RecursoMineralEditor({
           <Input
             type="number"
             step="0.1"
-            value={tasaRegalias ?? 0}
+            value={tasaRegalias}
             onChange={(e) => onChangeTasaRegalias(Number.parseFloat(e.target.value))}
             className="font-mono"
           />
@@ -1329,7 +1246,7 @@ function RecursoMineralEditor({
 interface ImpuestoEditorProps {
   nombre: string
   base: number
-  coefZ?: number // Ahora puede ser opcional si no aplica para todos los casos
+  coefZ: number
   onChangeBase: (v: number) => void
   onChangeCoefZ: (v: number) => void
 }
@@ -1342,7 +1259,7 @@ function ImpuestoEditor({ nombre, base, coefZ, onChangeBase, onChangeCoefZ }: Im
       </Badge>
       <Input
         type="number"
-        step="1000000" // Manteniendo el step general para impuestos, se puede ajustar si es necesario
+        step="1000000"
         placeholder="Base"
         value={base}
         onChange={(e) => onChangeBase(Number.parseFloat(e.target.value))}
@@ -1350,9 +1267,9 @@ function ImpuestoEditor({ nombre, base, coefZ, onChangeBase, onChangeCoefZ }: Im
       />
       <Input
         type="number"
-        step="100000" // Default step, puede variar
-        placeholder="Desviación Estocástica" // Cambiado a un término más general
-        value={coefZ ?? 0} // Asignar 0 si es undefined
+        step="1000000"
+        placeholder="Coef_Z"
+        value={coefZ}
         onChange={(e) => onChangeCoefZ(Number.parseFloat(e.target.value))}
         className="font-mono"
       />
