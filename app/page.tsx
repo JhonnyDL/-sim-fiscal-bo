@@ -53,7 +53,7 @@ export default function Page() {
   const [autoPlay, setAutoPlay] = useState(false)
   const [velocidadAutoPlay, setVelocidadAutoPlay] = useState(2000) // milliseconds
   const [escenarioSeleccionado, setEscenarioSeleccionado] = useState<string | null>(null)
-  const [metodoSimulacion, setMetodoSimulacion] = useState<"box-muller" | "monte-carlo">("box-muller")
+  const [metodoSimulacion, setMetodoSimulacion] = useState<"box-muller" | "monte-carlo">("monte-carlo")
   const [numSimulacionesMC, setNumSimulacionesMC] = useState(1000)
   const [resultadosMonteCarlo, setResultadosMonteCarlo] = useState<ResultadoMonteCarloComplete | null>(null)
   const [cargando, setCargando] = useState(false)
@@ -303,8 +303,8 @@ export default function Page() {
                 value={metodoSimulacion}
                 onValueChange={(v) => setMetodoSimulacion(v as "box-muller" | "monte-carlo")}
               >
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div
+                <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
+                  {/* <div
                     className={`flex items-start space-x-3 p-4 border-2 rounded-lg cursor-pointer transition-all ${metodoSimulacion === "box-muller"
                       ? "border-primary bg-primary/5"
                       : "border-muted hover:border-primary/50"
@@ -321,7 +321,7 @@ export default function Page() {
                         y eficiente para análisis individual.
                       </p>
                     </div>
-                  </div>
+                  </div> */}
 
                   <div
                     className={`flex items-start space-x-3 p-4 border-2 rounded-lg cursor-pointer transition-all ${metodoSimulacion === "monte-carlo"
@@ -336,8 +336,9 @@ export default function Page() {
                         Monte Carlo (Múltiples Iteraciones)
                       </Label>
                       <p className="text-sm text-muted-foreground mt-1">
-                        Ejecuta múltiples simulaciones para obtener distribuciones de probabilidad y estadísticas (P5,
-                        P50, P95). Más completo pero más lento.
+                        {/* Ejecuta múltiples simulaciones para obtener distribuciones de probabilidad y estadísticas (P5,
+                        P50, P95). Más completo pero más lento. */}
+                        
                       </p>
                       {metodoSimulacion === "monte-carlo" && (
                         <div className="mt-3 flex items-center gap-2">
@@ -440,7 +441,7 @@ export default function Page() {
           <TabsContent value="dashboard" className="space-y-6 animate-fade-in">
             {resultados && (
               <>
-                {resultadosMonteCarlo && (
+                {/* {resultadosMonteCarlo && (
                   <Card className="p-6 shadow-lg border-2 bg-gradient-to-br from-blue-50 to-purple-50">
                     <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
                       <div className="h-1 w-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full" />
@@ -518,7 +519,7 @@ export default function Page() {
                       iteraciones.
                     </p>
                   </Card>
-                )}
+                )} */}
                 <Card className="border-2 gradient-bolivia sticky top-0 z-10 shadow-lg">
                   <CardContent className="pt-6">
                     <div className="space-y-4">

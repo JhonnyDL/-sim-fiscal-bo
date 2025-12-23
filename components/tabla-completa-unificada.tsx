@@ -25,7 +25,6 @@ export default function TablaCompletaUnificada({ resultados, anoActual }: Props)
             "Deuda Total",
             "Deuda Externa",
             "Deuda Interna",
-            "Deuda/PIB%",
             "RIN",
             "PIB",
         ]
@@ -89,7 +88,7 @@ export default function TablaCompletaUnificada({ resultados, anoActual }: Props)
                                             <TableHead className="font-bold text-right">Gastos</TableHead>
                                             <TableHead className="font-bold text-right">Déficit/Superávit</TableHead>
                                             <TableHead className="font-bold text-right">Deuda Total</TableHead>
-                                            <TableHead className="font-bold text-right">Deuda/PIB</TableHead>
+                                            {/* <TableHead className="font-bold text-right">Deuda/PIB</TableHead> */}
                                             <TableHead className="font-bold text-right">RIN</TableHead>
                                             <TableHead className="font-bold text-right">PIB</TableHead>
                                             <TableHead className="font-bold text-right">Saldo Com.</TableHead>
@@ -116,7 +115,7 @@ export default function TablaCompletaUnificada({ resultados, anoActual }: Props)
                                                     </span>
                                                 </TableCell>
                                                 <TableCell className="text-right font-semibold">Bs{resultado.deuda_total.toFixed(0)}</TableCell>
-                                                <TableCell className="text-right">
+                                                {/* <TableCell className="text-right">
                                                     <div className="flex items-center justify-end gap-2">
                                                         {resultado.deuda_pib_ratio.toFixed(1)}%
                                                         {resultado.deuda_pib_ratio > 70 && (
@@ -125,7 +124,7 @@ export default function TablaCompletaUnificada({ resultados, anoActual }: Props)
                                                             </Badge>
                                                         )}
                                                     </div>
-                                                </TableCell>
+                                                </TableCell> */}
                                                 <TableCell className="text-right">
                                                     <div className="flex items-center justify-end gap-2">
                                                         Bs{resultado.rin.toFixed(0)}
@@ -173,9 +172,9 @@ export default function TablaCompletaUnificada({ resultados, anoActual }: Props)
                                                 <TableHead className="font-bold text-center" colSpan={3}>
                                                     Servicio de Deuda (Intereses)
                                                 </TableHead>
-                                                <TableHead className="font-bold text-center" colSpan={3}>
+                                                {/* <TableHead className="font-bold text-center" colSpan={3}>
                                                     Ratios de Sostenibilidad
-                                                </TableHead>
+                                                </TableHead> */}
                                             </TableRow>
                                             <TableRow className="bg-purple-200">
                                                 <TableHead className="text-right font-semibold">Externa</TableHead>
@@ -186,9 +185,9 @@ export default function TablaCompletaUnificada({ resultados, anoActual }: Props)
                                                 <TableHead className="text-right font-semibold">Int. Externa</TableHead>
                                                 <TableHead className="text-right font-semibold">Int. Interna</TableHead>
                                                 <TableHead className="text-right font-semibold">Total</TableHead>
-                                                <TableHead className="text-right font-semibold">Ext./PIB%</TableHead>
+                                                {/* <TableHead className="text-right font-semibold">Ext./PIB%</TableHead>
                                                 <TableHead className="text-right font-semibold">Int./PIB%</TableHead>
-                                                <TableHead className="text-right font-semibold">Total/PIB%</TableHead>
+                                                <TableHead className="text-right font-semibold">Total/PIB%</TableHead> */}
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
@@ -256,7 +255,7 @@ export default function TablaCompletaUnificada({ resultados, anoActual }: Props)
                                                         </TableCell>
 
                                                         {/* Ratios de Sostenibilidad */}
-                                                        <TableCell className="text-right">
+                                                        {/* <TableCell className="text-right">
                                                             <div className="flex items-center justify-end gap-2">
                                                                 {deudaExternaPib.toFixed(1)}%
                                                                 {alertaExternaAlta && (
@@ -285,7 +284,7 @@ export default function TablaCompletaUnificada({ resultados, anoActual }: Props)
                                                                     </Badge>
                                                                 )}
                                                             </div>
-                                                        </TableCell>
+                                                        </TableCell> */}
                                                     </TableRow>
                                                 )
                                             })}
@@ -295,7 +294,7 @@ export default function TablaCompletaUnificada({ resultados, anoActual }: Props)
                             </div>
 
                             {/* Tabla de Composición y Capacidad de Pago */}
-                            <div>
+                            {/* <div>
                                 <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                                     <div className="w-1 h-6 bg-indigo-600 rounded"></div>
                                     Composición de Deuda y Capacidad de Pago
@@ -389,7 +388,7 @@ export default function TablaCompletaUnificada({ resultados, anoActual }: Props)
                                         </TableBody>
                                     </Table>
                                 </div>
-                            </div>
+                            </div> */}
 
                             {/* Leyenda de Indicadores */}
                             <div className="p-4 bg-gray-50 rounded-lg border">
@@ -408,7 +407,7 @@ export default function TablaCompletaUnificada({ resultados, anoActual }: Props)
                                         <span className="font-medium">Capacidad de Pago:</span> Veces que los ingresos cubren los intereses
                                     </div>
                                 </div>
-                                <div className="mt-3 pt-3 border-t">
+                                {/* <div className="mt-3 pt-3 border-t">
                                     <h5 className="font-semibold mb-2">Alertas:</h5>
                                     <ul className="space-y-1 text-xs text-gray-600">
                                         <li>• Deuda Externa/PIB &gt; 40% = ALTO</li>
@@ -417,7 +416,7 @@ export default function TablaCompletaUnificada({ resultados, anoActual }: Props)
                                         <li>• Intereses/Ingresos &gt; 20% = Presión fiscal elevada</li>
                                         <li>• Capacidad de Pago &lt; 3x = Riesgo de insostenibilidad</li>
                                     </ul>
-                                </div>
+                                </div> */}
                             </div>
                         </TabsContent>
 
@@ -495,7 +494,7 @@ export default function TablaCompletaUnificada({ resultados, anoActual }: Props)
                                                 <TableHead className="text-right">ICE</TableHead>
                                                 <TableHead className="text-right">GA</TableHead>
                                                 <TableHead className="text-right">Total Impuestos</TableHead>
-                                                <TableHead className="text-right">Presión Tributaria</TableHead>
+                                                {/* <TableHead className="text-right">Presión Tributaria</TableHead> */}
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
@@ -510,11 +509,11 @@ export default function TablaCompletaUnificada({ resultados, anoActual }: Props)
                                                     <TableCell className="text-right">Bs{r.ing_ice.toFixed(0)}</TableCell>
                                                     <TableCell className="text-right">Bs{r.ing_ga.toFixed(0)}</TableCell>
                                                     <TableCell className="text-right font-bold">Bs{r.ing_impuestos_total.toFixed(0)}</TableCell>
-                                                    <TableCell className="text-right">
+                                                    {/* <TableCell className="text-right">
                                                         <Badge variant={r.presion_tributaria < 15 ? "destructive" : "default"}>
                                                             {r.presion_tributaria.toFixed(1)}%
                                                         </Badge>
-                                                    </TableCell>
+                                                    </TableCell> */}
                                                 </TableRow>
                                             ))}
                                         </TableBody>
@@ -536,7 +535,7 @@ export default function TablaCompletaUnificada({ resultados, anoActual }: Props)
                                                 <TableHead className="text-right">Δ Hidrocarburos</TableHead>
                                                 <TableHead className="text-right">Δ Minería</TableHead>
                                                 <TableHead className="text-right">Δ Impuestos</TableHead>
-                                                <TableHead className="text-right">Ingresos/PIB %</TableHead>
+                                                {/* <TableHead className="text-right">Ingresos/PIB %</TableHead> */}
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
@@ -600,7 +599,7 @@ export default function TablaCompletaUnificada({ resultados, anoActual }: Props)
                                                                 </span>
                                                             )}
                                                         </TableCell>
-                                                        <TableCell className="text-right font-semibold">{ingresosPibRatio.toFixed(1)}%</TableCell>
+                                                        {/* <TableCell className="text-right font-semibold">{ingresosPibRatio.toFixed(1)}%</TableCell> */}
                                                     </TableRow>
                                                 )
                                             })}
@@ -622,11 +621,11 @@ export default function TablaCompletaUnificada({ resultados, anoActual }: Props)
                                         <TableHeader>
                                             <TableRow className="bg-red-100">
                                                 <TableHead>Año</TableHead>
-                                                <TableHead className="text-right">Sueldos y Salarios</TableHead>
-                                                <TableHead className="text-right">Bienes y Servicios</TableHead>
-                                                <TableHead className="text-right">Inversión Pública</TableHead>
+                                                {/* <TableHead className="text-right">Sueldos y Salarios</TableHead>
+                                                <TableHead className="text-right">Bienes y Servicios</TableHead> */}
+                                                <TableHead className="text-right">Gastos Corrientes</TableHead>
                                                 <TableHead className="text-right">Total Gastos</TableHead>
-                                                <TableHead className="text-right">Gastos/PIB %</TableHead>
+                                                {/* <TableHead className="text-right">Gastos/PIB %</TableHead> */}
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
@@ -636,19 +635,19 @@ export default function TablaCompletaUnificada({ resultados, anoActual }: Props)
                                                 return (
                                                     <TableRow key={r.ano} className={idx % 2 === 0 ? "bg-gray-50" : ""}>
                                                         <TableCell className="font-medium">{r.ano}</TableCell>
-                                                        <TableCell className="text-right font-semibold">Bs{r.gasto_sueldos.toFixed(0)}</TableCell>
-                                                        <TableCell className="text-right">Bs{r.gasto_bienes_servicios.toFixed(0)}</TableCell>
+                                                        {/* <TableCell className="text-right font-semibold">Bs{r.gasto_sueldos.toFixed(0)}</TableCell> */}
+                                                        {/* <TableCell className="text-right">Bs{r.gasto_bienes_servicios.toFixed(0)}</TableCell> */}
                                                         <TableCell className="text-right font-semibold text-blue-700">
                                                             Bs{r.gasto_inversion.toFixed(0)}
                                                         </TableCell>
                                                         <TableCell className="text-right font-bold text-red-700">
                                                             Bs{r.gastos_totales.toFixed(0)}
                                                         </TableCell>
-                                                        <TableCell className="text-right">
+                                                        {/* <TableCell className="text-right">
                                                             <Badge variant={gastosPibRatio > 35 ? "destructive" : "default"}>
                                                                 {gastosPibRatio.toFixed(1)}%
                                                             </Badge>
-                                                        </TableCell>
+                                                        </TableCell> */}
                                                     </TableRow>
                                                 )
                                             })}
@@ -725,7 +724,7 @@ export default function TablaCompletaUnificada({ resultados, anoActual }: Props)
                                             <TableRow className="bg-pink-100">
                                                 <TableHead>Año</TableHead>
                                                 <TableHead className="text-right">Δ Gastos Totales</TableHead>
-                                                <TableHead className="text-right">Δ Inversión Pública</TableHead>
+                                                <TableHead className="text-right">Δ Gastos Corrientes</TableHead>
                                                 <TableHead className="text-right">Δ Subsidios</TableHead>
                                                 <TableHead className="text-right">Inversión/Gastos %</TableHead>
                                                 <TableHead className="text-right">Resultado Primario</TableHead>

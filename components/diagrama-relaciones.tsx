@@ -155,9 +155,9 @@ export default function DiagramaRelaciones({ resultado, resultadoAnterior }: Pro
                   actual={resultado.ing_impuestos_total}
                   anterior={resultadoAnterior?.ing_impuestos_total}
                 />
-                <div className="text-xs mt-2 text-yellow-700">
+                {/* <div className="text-xs mt-2 text-yellow-700">
                   Presión tributaria: {resultado.presion_tributaria.toFixed(1)}% del PIB
-                </div>
+                </div> */}
               </div>
             </div>
           </div>
@@ -180,8 +180,9 @@ export default function DiagramaRelaciones({ resultado, resultadoAnterior }: Pro
               <div>
                 <div className="font-semibold text-green-800 mb-2">Gastos Corrientes</div>
                 <div className="pl-4 space-y-1 text-sm">
-                  <div>Sueldos: Bs{resultado.gasto_sueldos.toFixed(0)}</div>
-                  <div>Bienes/Servicios: Bs{resultado.gasto_bienes_servicios.toFixed(0)}</div>
+                  {/* <div>Sueldos: Bs{resultado.gasto_sueldos.toFixed(0)}</div> */}
+                  {/* <div>Bienes/Servicios: Bs{resultado.gasto_bienes_servicios.toFixed(0)}</div> */}
+                  <div>Gasto Corriente: Bs{resultado.gasto_inversion.toFixed(0)}</div>
                   <div>
                     Subsidio combustibles: Bs{resultado.gasto_subsidio_combustibles.toFixed(0)}
                     {resultado.gasto_subsidio_combustibles === 0 && (
@@ -201,9 +202,9 @@ export default function DiagramaRelaciones({ resultado, resultadoAnterior }: Pro
                 </div>
               </div>
               <div>
-                <div className="font-semibold text-green-800 mb-2">Gastos de Capital e Intereses</div>
+                <div className="font-semibold text-green-800 mb-2">Intereses</div>
                 <div className="pl-4 space-y-1 text-sm">
-                  <div>Inversión pública: Bs{resultado.gasto_inversion.toFixed(0)}</div>
+                  {/* <div>Inversión pública: Bs{resultado.gasto_inversion.toFixed(0)}</div> */}
                   <div>Intereses deuda externa: Bs{resultado.intereses_deuda_externa.toFixed(0)}</div>
                   <div>Intereses deuda interna: Bs{resultado.intereses_deuda_interna.toFixed(0)}</div>
                 </div>
@@ -227,7 +228,7 @@ export default function DiagramaRelaciones({ resultado, resultadoAnterior }: Pro
                 <div className="text-2xl font-bold text-red-700 mt-2">
                   {resultado.deficit_superavit > 0 ? "-" : "+"}Bs{Math.abs(resultado.deficit_superavit).toFixed(0)}
                 </div>
-                <div className="text-xs mt-1 text-red-600">{resultado.deficit_pib_ratio.toFixed(1)}% del PIB</div>
+                {/* <div className="text-xs mt-1 text-red-600">{resultado.deficit_pib_ratio.toFixed(1)}% del PIB</div> */}
               </div>
 
               <div className="flex flex-col items-center gap-2">
@@ -243,7 +244,7 @@ export default function DiagramaRelaciones({ resultado, resultadoAnterior }: Pro
                 <div className="font-bold text-orange-900">DEUDA PÚBLICA</div>
                 <div className="text-2xl font-bold text-orange-700 mt-2">Bs{resultado.deuda_total.toFixed(0)}</div>
                 <CambioIndicador actual={resultado.deuda_total} anterior={resultadoAnterior?.deuda_total} />
-                <div className="text-xs mt-1 text-orange-600">
+                {/* <div className="text-xs mt-1 text-orange-600">
                   Ratio Deuda/PIB: {resultado.deuda_pib_ratio.toFixed(1)}%
                   {resultado.deuda_pib_ratio > 70 && (
                     <Badge variant="destructive" className="ml-2 text-xs">
@@ -251,7 +252,7 @@ export default function DiagramaRelaciones({ resultado, resultadoAnterior }: Pro
                       RIESGO
                     </Badge>
                   )}
-                </div>
+                </div> */}
               </div>
             </div>
           </div>
